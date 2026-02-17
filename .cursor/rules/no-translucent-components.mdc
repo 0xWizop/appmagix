@@ -1,0 +1,52 @@
+---
+description: Avoid translucent components; prefer solid colors for UI elements
+globs: **/*.tsx
+alwaysApply: true
+---
+
+# No Translucent Components
+
+Avoid translucent components in the dashboard and UI. Use **solid colors** instead of opacity-based backgrounds and borders.
+
+## Avoid
+
+- `bg-brand-green/5`, `bg-brand-green/10`, `bg-brand-green/20` (translucent backgrounds)
+- `border-brand-green/20`, `border-border/50` (translucent borders)
+- `bg-surface-hover/50` for cards and content areas
+
+## Prefer
+
+- **Backgrounds**: `bg-brand-green-dark`, `bg-brand-green`, `bg-surface` (solid)
+- **Borders**: `border-brand-green`, `border-brand-green-dark`, `border-border` (solid)
+- **Active/highlight states**: `bg-brand-green-dark` instead of `bg-brand-green/20`
+
+## Examples
+
+```tsx
+// ❌ Translucent card
+<Card className="bg-brand-green/5 border-brand-green/20">
+
+// ✅ Solid card (use app's brand green)
+<Card className="bg-brand-green-dark border-brand-green">
+```
+
+```tsx
+// ❌ Translucent icon circle
+<div className="rounded-full bg-brand-green/20">
+
+// ✅ Solid icon circle (use app's brand green)
+<div className="rounded-full bg-brand-green-dark">
+```
+
+## Text/icon contrast on green
+
+When using `bg-brand-green-dark` or `bg-brand-green`, ensure text and icons are high contrast:
+- **bg-brand-green-dark** (dark green) → use `text-white` for text and icons
+- **bg-brand-green** (bright green) → use `text-black` for text and icons
+
+## Exceptions
+
+Translucency is acceptable for:
+- Modal/overlay backdrops (`bg-black/50`, `bg-black/80`)
+- Hero gradients and decorative blur effects
+- Hover states on interactive elements (e.g. `hover:bg-brand-green/50`)
