@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
@@ -8,84 +8,51 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { CheckCircle, ShoppingBag, Code2, ArrowRight, MessageSquare } from "lucide-react";
-
-const shopifyFeatures = [
-  "Premium Shopify theme",
-  "Full theme customization",
-  "Brand colors & typography",
-  "Homepage design",
-  "Product page optimization",
-  "Collection pages setup",
-  "Mobile responsive design",
-  "Essential app integrations",
-  "Payment gateway setup",
-  "Shipping configuration",
-  "Basic SEO setup",
-  "1 round of revisions",
-  "30 days post-launch support",
-];
-
-const customFeatures = [
-  "100% custom design",
-  "Unlimited pages",
-  "Custom React/Next.js build",
-  "Headless CMS integration",
-  "Custom checkout flows",
-  "Advanced animations",
-  "Performance optimization",
-  "Custom integrations",
-  "API development",
-  "Admin dashboard",
-  "Advanced SEO setup",
-  "3 rounds of revisions",
-  "90 days post-launch support",
-];
+import { MessageSquare } from "lucide-react";
+import { CheckoutButton } from "@/components/checkout-button";
+import { PricingCalculator } from "@/components/pricing/pricing-calculator";
+import { PricingToggle } from "@/components/pricing/pricing-toggle";
 
 const addOns = [
-  { name: "Email marketing setup (Klaviyo)", price: "$149" },
-  { name: "Product photography guidelines", price: "$99" },
-  { name: "Copywriting (per page)", price: "$75" },
-  { name: "Additional revision rounds", price: "$149/round" },
-  { name: "Extended support (per month)", price: "$199/month" },
-  { name: "Analytics & reporting setup", price: "$149" },
+  { name: "Additional revision round", price: "$149", productKey: "additional_revision_round" as const },
+  { name: "Extended support (per month)", price: "$199/month", productKey: "extended_support" as const },
 ];
 
 const faqs = [
   {
     question: "How long does a typical project take?",
     answer:
-      "Shopify builds typically take 2-3 weeks from kickoff to launch. Custom builds take 4-6 weeks depending on complexity. We'll give you a precise timeline during our initial consultation.",
+      "Custom websites typically take 3–4 weeks from kickoff to launch. Web apps and SaaS products take 6–10 weeks depending on feature scope. E-commerce builds are usually 2–3 weeks. We'll give you a precise timeline during our initial consultation.",
   },
   {
     question: "What do I need to provide to get started?",
     answer:
-      "We'll need your brand guidelines (logo, colors, fonts), product information and images, and any specific features or integrations you want. Don't worry if you don't have everything ready - we can help guide you through it.",
+      "We'll need your brand guidelines (logo, colors, fonts), content or copy for your pages, and a clear picture of what you want to achieve. Don't worry if you don't have everything — we can help with brand direction, copywriting, and content strategy.",
   },
   {
     question: "Do you offer payment plans?",
     answer:
-      "Yes! We typically split payments into 2-3 milestones: deposit to start, mid-project payment, and final payment before launch. We can discuss what works best for your situation.",
+      "Yes! We typically split payments into milestones: deposit to start, mid-project payment, and final payment before launch. We can discuss what works best for your situation.",
   },
   {
     question: "What if I need changes after launch?",
     answer:
-      "All packages include post-launch support (30 days for Shopify, 90 days for Custom). After that, we offer monthly retainer packages or hourly rates for ongoing changes and maintenance.",
+      "All packages include at least 30 days of post-launch support. After that, we offer monthly retainer packages or a pay-as-you-go model for ongoing changes and maintenance.",
   },
   {
     question: "Do you help with hosting and domains?",
     answer:
-      "For Shopify builds, hosting is included in your Shopify subscription. For custom builds, we recommend and help set up hosting on Vercel (often free for most sites). We can also help with domain setup.",
+      "Absolutely. For custom websites and web apps we recommend Vercel, Railway, or Fly.io — many are free or very affordable. For e-commerce we'll help you choose and set up the right platform. We handle domain setup and DNS too.",
   },
   {
-    question: "Can you migrate my existing store?",
+    question: "Can you build a mobile app too?",
     answer:
-      "Absolutely. We handle full migrations including products, customers, orders history, and SEO redirects. Migration is included in the project scope.",
+      "Yes — we build cross-platform mobile apps using React Native, sharing code with your web app for maximum efficiency. Select 'Mobile App' in our custom quote calculator to see pricing.",
   },
   {
-    question: "What's the difference between Shopify and Custom builds?",
+    question: "Which e-commerce platforms do you work with?",
     answer:
-      "Shopify is great for most businesses - it's fast to launch, easy to manage, and handles payments/shipping out of the box. Custom builds are for businesses with unique needs that Shopify can't handle, or those who want complete control over their tech stack.",
+      "We're platform-agnostic. We work with Shopify, Next.js Commerce (headless), WooCommerce, and fully custom storefronts. We'll recommend the right fit based on your product catalogue, budget, and long-term goals.",
   },
   {
     question: "Do you offer ongoing maintenance?",
@@ -100,7 +67,7 @@ export default function PricingPage() {
       {/* Hero Section */}
       <section className="section-padding pt-24">
         <div className="container-width">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-12">
             <Badge className="mb-4">Transparent Pricing</Badge>
             <h1 className="text-4xl sm:text-5xl font-medium mb-6">
               Simple pricing,{" "}
@@ -112,90 +79,27 @@ export default function PricingPage() {
             </p>
           </div>
 
-          {/* Pricing Cards */}
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Shopify Plan */}
-            <Card className="relative shadow-none">
-              <CardHeader>
-                <div className="h-12 w-12 rounded-xl bg-brand-green/20 flex items-center justify-center mb-4">
-                  <ShoppingBag className="h-6 w-6 text-brand-green" />
-                </div>
-                <CardTitle className="text-2xl">Shopify Build</CardTitle>
-                <CardDescription>
-                  Perfect for businesses ready to launch quickly with a proven platform
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-medium">$799</span>
-                    <span className="text-text-muted">starting at</span>
-                  </div>
-                  <p className="text-sm text-text-muted mt-1">
-                    + Shopify subscription ($29-$299/mo)
-                  </p>
-                </div>
+          {/* Interactive Pricing Toggle + Cards */}
+          <PricingToggle />
+        </div>
+      </section>
 
-                <ul className="space-y-3 mb-8">
-                  {shopifyFeatures.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-brand-green mt-0.5 shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                <Button className="w-full" size="lg" asChild>
-                  <Link href="/contact?plan=shopify">
-                    Get Started
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Custom Plan */}
-            <Card className="relative border-brand-green/50 shadow-none">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <Badge>Most Popular</Badge>
-              </div>
-              <CardHeader>
-                <div className="h-12 w-12 rounded-xl bg-brand-green/20 flex items-center justify-center mb-4">
-                  <Code2 className="h-6 w-6 text-brand-green" />
-                </div>
-                <CardTitle className="text-2xl">Custom Build</CardTitle>
-                <CardDescription>
-                  For businesses that need complete flexibility and unique features
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-medium">$2,499</span>
-                    <span className="text-text-muted">starting at</span>
-                  </div>
-                  <p className="text-sm text-text-muted mt-1">
-                    Hosting from $0-20/mo (Vercel)
-                  </p>
-                </div>
-
-                <ul className="space-y-3 mb-8">
-                  {customFeatures.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm">
-                      <CheckCircle className="h-4 w-4 text-brand-green mt-0.5 shrink-0" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                <Button className="w-full" size="lg" asChild>
-                  <Link href="/contact?plan=custom">
-                    Get Started
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
+      {/* Interactive Calculator Section */}
+      <section className="section-padding bg-background border-y border-border">
+        <div className="container-width">
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <Badge variant="outline" className="mb-4">Custom Quote</Badge>
+            <h2 className="text-3xl sm:text-4xl font-medium mb-4">
+              Need something specific?
+            </h2>
+            <p className="text-text-secondary">
+              Use our interactive calculator to build your perfect package and get an 
+              instant estimated quote for your project.
+            </p>
+          </div>
+          
+          <div className="max-w-5xl mx-auto">
+            <PricingCalculator />
           </div>
         </div>
       </section>
@@ -210,14 +114,17 @@ export default function PricingPage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
             {addOns.map((addon) => (
-              <Card key={addon.name} className="shadow-none">
-                <CardContent className="p-4 flex justify-between items-center">
-                  <span className="text-sm">{addon.name}</span>
-                  <span className="font-medium text-brand-green">
-                    {addon.price}
-                  </span>
+              <Card key={addon.name} className="shadow-none border-border">
+                <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <span className="text-sm font-medium">{addon.name}</span>
+                    <span className="ml-2 font-medium text-brand-green">{addon.price}</span>
+                  </div>
+                  <CheckoutButton productKey={addon.productKey} size="sm" className="shrink-0">
+                    Add to checkout
+                  </CheckoutButton>
                 </CardContent>
               </Card>
             ))}

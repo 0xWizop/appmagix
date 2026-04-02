@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/firebase-session";
-import { addTicketMessage } from "@/lib/firestore";
+import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
+import { db } from "@/lib/db";
 import { z } from "zod";
+import { sendTicketReplyNotification } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -22,16 +24,62 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const user = await getOrCreateUserByFirebaseUid(
+      session.user.id,
+      session.user.email,
+      session.user.name
+    );
+
     const body = await req.json();
     const { content } = createMessageSchema.parse(body);
 
-    const message = await addTicketMessage(ticketId, session.user.id, content);
-
-    if (!message) {
-      return NextResponse.json({ error: "Ticket not found or resolved" }, { status: 404 });
+    // Load ticket with owner info for email notification
+    const ticket = await db.ticket.findFirst({
+      where: { id: ticketId, userId: user.id },
+      include: { user: { select: { id: true, name: true, email: true } } },
+    });
+    if (!ticket) {
+      return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message }, { status: 201 });
+    const message = await db.ticketMessage.create({
+      data: {
+        ticketId,
+        senderId: user.id,
+        content: content.trim(),
+      },
+    });
+
+    // Send email to the ticket owner if the reply is NOT from the owner themselves
+    // (i.e., admin replied — or just always notify for now since there's no admin role check)
+    if (
+      ticket.user?.email &&
+      !ticket.user.email.endsWith("@placeholder.local")
+    ) {
+      sendTicketReplyNotification({
+        to: ticket.user.email,
+        clientName: ticket.user.name || "there",
+        ticketSubject: ticket.subject,
+        replyContent: content.trim(),
+        ticketId: ticketId,
+        replierName: session.user.name || undefined,
+      }).catch((err) =>
+        console.error("Failed to send ticket reply email:", err)
+      );
+    }
+
+    return NextResponse.json(
+      {
+        message: {
+          id: message.id,
+          ticketId: message.ticketId,
+          senderId: message.senderId,
+          content: message.content,
+          createdAt: message.createdAt,
+        },
+      },
+      { status: 201 }
+    );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -39,7 +87,6 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
         { status: 400 }
       );
     }
-
     console.error("Error creating message:", error);
     return NextResponse.json(
       { error: "Failed to send message" },

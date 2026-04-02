@@ -1,10 +1,28 @@
 {
   "hosting": {
+    "site": "blastoff-2443e",
     "source": ".",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.md",
+      "**/__tests__/**",
+      "**/*.test.*",
+      "**/*.spec.*",
+      "**/scripts/**",
+      "**/coverage/**",
+      "**/.next/cache/**"
+    ],
     "frameworksBackend": {
       "region": "us-central1"
-    }
+    },
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/__next"
+      }
+    ]
   },
   "firestore": {
     "rules": "firestore.rules",

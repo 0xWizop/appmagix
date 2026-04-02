@@ -134,12 +134,12 @@ export function IntakeForm({
   if (submitted) {
     return (
       <Card className="border-brand-green">
-        <CardContent className="pt-8 pb-8 text-center">
-          <div className="h-16 w-16 rounded-full bg-brand-green-dark flex items-center justify-center mx-auto mb-4">
+        <CardContent className="pt-10 pb-10 text-center">
+          <div className="h-16 w-16 rounded-full bg-brand-green-dark flex items-center justify-center mx-auto mb-5">
             <CheckCircle className="h-8 w-8 text-white" />
           </div>
-          <h3 className="text-xl font-medium mb-2">Thank you!</h3>
-          <p className="text-text-secondary text-sm max-w-sm mx-auto">
+          <h3 className="text-xl font-semibold mb-2">Thank you!</h3>
+          <p className="text-text-secondary text-sm max-w-sm mx-auto leading-relaxed">
             We&apos;ve received your project details. We&apos;ll review and respond within 24 hours via email.
           </p>
         </CardContent>
@@ -148,29 +148,33 @@ export function IntakeForm({
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2 mb-2">
+    <Card className="border-border">
+      <CardHeader className="space-y-4 pb-6">
+        <div className="flex items-center gap-2">
           {STEPS.map((s) => (
             <div
               key={s.id}
               className={cn(
-                "h-2 flex-1 rounded-full transition-colors",
+                "h-2.5 flex-1 rounded-full transition-colors",
                 step >= s.id ? "bg-brand-green" : "bg-surface"
               )}
             />
           ))}
         </div>
-        <CardTitle className="text-lg">{STEPS[step - 1].title}</CardTitle>
-        <CardDescription>{STEPS[step - 1].description}</CardDescription>
+        <div>
+          <CardTitle className="text-xl font-semibold">{STEPS[step - 1].title}</CardTitle>
+          <CardDescription className="mt-1 text-text-secondary">
+            {STEPS[step - 1].description}
+          </CardDescription>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5 pt-0">
         {step === 1 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="space-y-2">
-              <Label>Project Type</Label>
+              <Label className="text-sm font-medium">Project Type</Label>
               <Select value={formData.projectType} onValueChange={(v) => update("projectType", v)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11">
                   <SelectValue placeholder="Select project type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -186,18 +190,20 @@ export function IntakeForm({
         )}
 
         {step === 2 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="space-y-2">
-              <Label>Business Name</Label>
+              <Label className="text-sm font-medium">Business Name</Label>
               <Input
+                className="h-11"
                 placeholder="Acme Inc"
                 value={formData.businessName}
                 onChange={(e) => update("businessName", e.target.value)}
               />
             </div>
             <div className="space-y-2">
-              <Label>Industry</Label>
+              <Label className="text-sm font-medium">Industry</Label>
               <Input
+                className="h-11"
                 placeholder="e.g. Fashion, Food & Beverage"
                 value={formData.industry}
                 onChange={(e) => update("industry", e.target.value)}
@@ -207,34 +213,36 @@ export function IntakeForm({
         )}
 
         {step === 3 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="space-y-2">
-              <Label>Goals</Label>
+              <Label className="text-sm font-medium">Goals</Label>
               <Textarea
                 placeholder="What do you want to achieve with this project?"
                 value={formData.goals}
                 onChange={(e) => update("goals", e.target.value)}
                 rows={3}
+                className="resize-none"
               />
             </div>
             <div className="space-y-2">
-              <Label>Scope / Features</Label>
+              <Label className="text-sm font-medium">Scope / Features</Label>
               <Textarea
                 placeholder="Key features, integrations, or requirements"
                 value={formData.features}
                 onChange={(e) => update("features", e.target.value)}
                 rows={3}
+                className="resize-none"
               />
             </div>
           </div>
         )}
 
         {step === 4 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="space-y-2">
-              <Label>Budget Range</Label>
+              <Label className="text-sm font-medium">Budget Range</Label>
               <Select value={formData.budget} onValueChange={(v) => update("budget", v)}>
-                <SelectTrigger>
+                <SelectTrigger className="h-11">
                   <SelectValue placeholder="Select budget range" />
                 </SelectTrigger>
                 <SelectContent>
@@ -247,8 +255,9 @@ export function IntakeForm({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Timeline</Label>
+              <Label className="text-sm font-medium">Timeline</Label>
               <Input
+                className="h-11"
                 placeholder="e.g. 4 weeks, ASAP"
                 value={formData.timeline}
                 onChange={(e) => update("timeline", e.target.value)}
@@ -258,10 +267,11 @@ export function IntakeForm({
         )}
 
         {step === 5 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div className="space-y-2">
-              <Label>Your Name *</Label>
+              <Label className="text-sm font-medium">Your Name *</Label>
               <Input
+                className="h-11"
                 placeholder="John Doe"
                 value={formData.contactName}
                 onChange={(e) => update("contactName", e.target.value)}
@@ -269,8 +279,9 @@ export function IntakeForm({
               />
             </div>
             <div className="space-y-2">
-              <Label>Email *</Label>
+              <Label className="text-sm font-medium">Email *</Label>
               <Input
+                className="h-11"
                 type="email"
                 placeholder="you@example.com"
                 value={formData.contactEmail}
@@ -279,8 +290,9 @@ export function IntakeForm({
               />
             </div>
             <div className="space-y-2">
-              <Label>Phone (optional)</Label>
+              <Label className="text-sm font-medium text-text-secondary">Phone (optional)</Label>
               <Input
+                className="h-11"
                 type="tel"
                 placeholder="+1 (555) 123-4567"
                 value={formData.contactPhone}
@@ -290,9 +302,9 @@ export function IntakeForm({
           </div>
         )}
 
-        <div className="flex gap-2 pt-4">
+        <div className="flex gap-3 pt-6 mt-6 border-t border-border">
           {step > 1 ? (
-            <Button type="button" variant="outline" onClick={() => setStep(step - 1)}>
+            <Button type="button" variant="outline" onClick={() => setStep(step - 1)} className="min-w-[100px]">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back
             </Button>
@@ -303,12 +315,13 @@ export function IntakeForm({
               type="button"
               onClick={() => setStep(step + 1)}
               disabled={!canProceed()}
+              className="min-w-[120px]"
             >
               Next
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handleSubmit} disabled={loading || !canProceed()}>
+            <Button onClick={handleSubmit} disabled={loading || !canProceed()} className="min-w-[120px]">
               {loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               ) : (

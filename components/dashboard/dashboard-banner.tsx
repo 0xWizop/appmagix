@@ -29,6 +29,7 @@ function getTitleForPath(pathname: string): { title: string; subtitle?: string }
   if (ROUTE_TITLES[pathname]) return ROUTE_TITLES[pathname];
   if (pathname.startsWith("/dashboard/web2/projects/")) return { title: "Project", subtitle: "Project details" };
   if (pathname.startsWith("/dashboard/web2/support/")) return { title: "Support Ticket", subtitle: "View and reply" };
+  if (pathname.startsWith("/dashboard/web2/crm/")) return { title: "Contact", subtitle: "Contact details and notes" };
   if (pathname.startsWith("/dashboard/web2/admin/")) return { title: "Admin", subtitle: "" };
   return { title: "Dashboard", subtitle: "" };
 }

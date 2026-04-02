@@ -5,11 +5,11 @@ const footerLinks = {
   services: [
     { name: "Web & App Development", href: "/services" },
     { name: "Shopify & Ecommerce", href: "/services#shopify" },
-    { name: "Our Apps", href: "/apps" },
   ],
   company: [
     { name: "Work", href: "/work" },
     { name: "Pricing", href: "/pricing" },
+    { name: "Documentation", href: "/docs" },
     { name: "Help", href: "/help" },
     { name: "Contact", href: "/contact" },
   ],

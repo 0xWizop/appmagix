@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/firebase-session";
 import { redirect } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Activity, TrendingUp, Users, Zap } from "lucide-react";
 
 export default async function ProtocolDashboardPage() {

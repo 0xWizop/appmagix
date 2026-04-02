@@ -13,7 +13,12 @@ export interface SessionUser {
 /** Get the current session from the Firebase session cookie. Use in server components and API routes. */
 export async function getSession(): Promise<{ user: SessionUser } | null> {
   try {
-    const adminAuth = getAdminAuth();
+    let adminAuth;
+    try {
+      adminAuth = getAdminAuth();
+    } catch {
+      return null;
+    }
     const cookieStore = await cookies();
     const sessionCookie = cookieStore.get(SESSION_COOKIE_NAME)?.value;
 
@@ -25,13 +30,18 @@ export async function getSession(): Promise<{ user: SessionUser } | null> {
     let role = decoded.role ?? "CLIENT";
 
     let accountType: "USER" | "DEVELOPER" = "USER";
-    const userDoc = await getAdminFirestore().collection("users").doc(decoded.uid).get();
-    if (userDoc.exists) {
-      const data = userDoc.data()!;
-      name = name ?? data.displayName ?? null;
-      image = image ?? data.photoURL ?? null;
-      role = data.role ?? role;
-      accountType = data.accountType === "DEVELOPER" ? "DEVELOPER" : "USER";
+    try {
+      const firestore = getAdminFirestore();
+      const userDoc = await firestore.collection("users").doc(decoded.uid).get();
+      if (userDoc.exists) {
+        const data = userDoc.data()!;
+        name = name ?? data.displayName ?? null;
+        image = image ?? data.photoURL ?? null;
+        role = data.role ?? role;
+        accountType = data.accountType === "DEVELOPER" ? "DEVELOPER" : "USER";
+      }
+    } catch {
+      // Firestore not configured or read failed; use token data only
     }
 
     return {
@@ -44,7 +54,8 @@ export async function getSession(): Promise<{ user: SessionUser } | null> {
         accountType,
       },
     };
-  } catch {
+  } catch (error) {
+    console.error("[getSession] Unexpected error:", error);
     return null;
   }
 }

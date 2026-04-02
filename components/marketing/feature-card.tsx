@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingBag, Code2, Palette, Rocket } from "lucide-react";
+import { ShoppingBag, Code2, Palette, Rocket, Smartphone, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const iconMap = {
@@ -10,6 +10,8 @@ const iconMap = {
   Code2,
   Palette,
   Rocket,
+  Smartphone,
+  Zap,
 } as const;
 
 interface FeatureCardProps {

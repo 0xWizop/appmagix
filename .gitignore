@@ -28,6 +28,7 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.stripe.copy-paste.txt
 
 # vercel
 .vercel
@@ -43,3 +44,4 @@ prisma/*.db-journal
 # Firebase (never commit service account key)
 firebase-service-account.json
 *-firebase-adminsdk-*.json
+.firebase/

@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/firebase-session";
-import { getTicketWithMessages } from "@/lib/firestore";
+import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
+import { getTicketWithMessagesByPrismaUserId } from "@/lib/db-tickets";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,10 +36,14 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
     notFound();
   }
 
-  let ticket: Awaited<ReturnType<typeof getTicketWithMessages>> = null;
-  
+  let ticket: Awaited<ReturnType<typeof getTicketWithMessagesByPrismaUserId>> = null;
   try {
-    ticket = await getTicketWithMessages(id, session.user.id);
+    const user = await getOrCreateUserByFirebaseUid(
+      session.user.id,
+      session.user.email,
+      session.user.name
+    );
+    ticket = await getTicketWithMessagesByPrismaUserId(id, user.id);
   } catch (error) {
     console.error("Error fetching ticket:", error);
   }
@@ -84,7 +89,7 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
         </div>
       </div>
 
-      <Card className="border-border/50">
+      <Card className="border-border">
         <CardHeader>
           <div className="flex items-center gap-3">
             <Avatar>
@@ -115,19 +120,19 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
             return (
               <Card
                 key={message.id}
-                className={isAdmin ? "border-border/60" : "border-border/50"}
+                className={isAdmin ? "border-border" : "border-border"}
               >
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-3">
                     <Avatar>
-                      <AvatarImage src={message.sender?.photoURL ?? undefined} />
+                      <AvatarImage src={message.sender?.avatarUrl ?? undefined} />
                       <AvatarFallback className="bg-surface-hover text-text-secondary">
-                        {getInitials(message.sender?.displayName ?? message.sender?.email)}
+                        {getInitials(message.sender?.name ?? message.sender?.email)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium">{message.sender?.displayName ?? message.sender?.email ?? "User"}</span>
+                        <span className="font-medium">{message.sender?.name ?? message.sender?.email ?? "User"}</span>
                         {isAdmin && (
                           <Badge variant="secondary" className="text-xs">
                             Support
@@ -157,8 +162,8 @@ export default async function TicketDetailPage({ params }: TicketDetailPageProps
         </>
       )}
 
-      {ticket.status === "RESOLVED" && (
-        <Card className="border-border/50">
+        {ticket.status === "RESOLVED" && (
+        <Card className="border-border">
           <CardContent className="p-4 text-center">
             <p className="text-sm text-text-secondary">
               This ticket has been resolved. Create a new ticket for further assistance.

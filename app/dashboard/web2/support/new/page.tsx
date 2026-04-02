@@ -34,12 +34,28 @@ export default function NewTicketPage() {
   });
 
   useEffect(() => {
-    // Fetch user's projects
-    fetch("/api/projects")
-      .then((res) => res.json())
+    fetch("/api/projects", { credentials: "include" })
+      .then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          const message =
+            typeof data?.error === "string"
+              ? data.error
+              : "Failed to load projects";
+          throw new Error(message);
+        }
+        return res.json();
+      })
       .then((data) => setProjects(data.projects || []))
-      .catch(console.error);
-  }, []);
+      .catch((err) => {
+        console.error("Error loading projects for support:", err);
+        setProjects([]);
+        toast.error(
+          "Could not load projects",
+          "You can still create a ticket without linking a project."
+        );
+      });
+  }, [toast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,26 +65,32 @@ export default function NewTicketPage() {
       const response = await fetch("/api/tickets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error("Failed to create ticket");
+        const message = typeof data?.error === "string" ? data.error : "Failed to create ticket";
+        throw new Error(message);
       }
 
-      const data = await response.json();
+      const ticketId = data?.ticket?.id;
+      if (!ticketId) {
+        throw new Error("Invalid response from server");
+      }
       toast.success("Ticket created");
-      router.push(`/dashboard/web2/support/${data.ticket.id}`);
+      router.push(`/dashboard/web2/support/${ticketId}`);
     } catch (error) {
       console.error("Error creating ticket:", error);
-      toast.error("Failed to create ticket", "Please try again");
+      toast.error("Failed to create ticket", error instanceof Error ? error.message : "Please try again");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-2xl">
+    <div className="p-6 lg:p-8 max-w-2xl mx-auto">
       <Button variant="ghost" asChild className="mb-6 -ml-2">
         <Link href="/dashboard/web2/support">
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -76,7 +98,7 @@ export default function NewTicketPage() {
         </Link>
       </Button>
 
-      <Card className="border-border/50">
+      <Card className="border-border">
         <CardHeader>
           <CardTitle className="text-lg font-medium">New ticket</CardTitle>
           <CardDescription className="text-sm">
@@ -106,12 +128,12 @@ export default function NewTicketPage() {
                   onValueChange={(value) =>
                     setFormData({ ...formData, projectId: value })
                   }
+                  disabled={projects.length === 0}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select a project" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">No specific project</SelectItem>
                     {projects.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
                         {project.name}
@@ -119,6 +141,11 @@ export default function NewTicketPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                {projects.length === 0 && (
+                  <p className="text-xs text-text-muted">
+                    No projects yet. You can still create a ticket without linking a project.
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">

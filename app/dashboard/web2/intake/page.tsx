@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/firebase-session";
 import { redirect } from "next/navigation";
 import { IntakeForm } from "@/components/intake/intake-form";
+import { PageTips } from "@/components/dashboard/page-tips";
 
 export default async function IntakePage() {
   const session = await getSession();
@@ -11,18 +12,20 @@ export default async function IntakePage() {
   return (
     <div className="p-6 lg:p-8 max-w-2xl mx-auto">
       <div className="mb-8 text-center">
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-brand-green/20 border border-brand-green/50 mb-4">
-          <span className="inline-block w-2 h-2 rounded-full bg-brand-green" />
-          <span className="text-xs font-medium text-brand-green uppercase tracking-wider">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-green/20 border border-brand-green mb-5">
+          <span className="inline-block w-2 h-2 rounded-full bg-brand-green animate-pulse" />
+          <span className="text-xs font-semibold text-brand-green uppercase tracking-wider">
             Project Intake
           </span>
         </div>
-        <h1 className="text-3xl font-medium tracking-tight">Start a New Project</h1>
-        <p className="text-text-secondary mt-2 text-sm max-w-xl mx-auto">
+        <h1 className="text-3xl font-semibold tracking-tight">Start a New Project</h1>
+        <p className="text-text-secondary mt-3 text-sm max-w-xl mx-auto leading-relaxed">
           Fill out this form to tell us about your project. We&apos;ll review and respond within 24 hours—no calls required.
         </p>
       </div>
-
+      <div className="mb-8">
+        <PageTips />
+      </div>
       <IntakeForm
         defaultContactName={session.user.name ?? ""}
         defaultContactEmail={session.user.email ?? ""}

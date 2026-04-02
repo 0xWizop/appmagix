@@ -32,6 +32,7 @@ import {
   Wallet,
   Vote,
   Search,
+  CalendarDays,
 } from "lucide-react";
 
 const clientTopNav = [
@@ -47,6 +48,7 @@ const clientProjectsSection = [
 const clientPeopleSection = [
   { name: "CRM", href: "/dashboard/web2/crm", icon: Users2 },
   { name: "Team", href: "/dashboard/web2/team", icon: Users },
+  { name: "Booking", href: "/dashboard/web2/booking", icon: CalendarDays },
 ];
 
 const clientTrackSection = [
@@ -75,6 +77,7 @@ const adminProjectsSection = [
 const adminPeopleSection = [
   { name: "CRM", href: "/dashboard/web2/crm", icon: Users2 },
   { name: "Team", href: "/dashboard/web2/team", icon: Users },
+  { name: "Booking", href: "/dashboard/web2/booking", icon: CalendarDays },
 ];
 
 const adminTrackSection = [

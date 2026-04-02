@@ -24,30 +24,69 @@ const preferencesSchema = z.object({
     })
     .optional()
     .nullable(),
+  pinnedNotes: z
+    .array(
+      z.object({
+        id: z.string(),
+        text: z.string().max(500),
+        color: z.string().max(20),
+        createdAt: z.string(),
+      })
+    )
+    .max(20)
+    .optional(),
+  brandColors: z
+    .object({
+      primary: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/).optional(),
+      secondary: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/).optional(),
+      accent: z.string().regex(/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/).optional(),
+    })
+    .optional(),
 });
 
 export async function GET() {
-  const session = await getSession();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  try {
+    const session = await getSession();
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  const db = getAdminFirestore();
-  if (!db) {
-    return NextResponse.json({ preferences: { devMode: false, web3Mode: false } });
-  }
+    const db = getAdminFirestore();
+    if (!db) {
+      return NextResponse.json({ preferences: { devMode: false, web3Mode: false } });
+    }
 
-  const doc = await db.collection("user_settings").doc(session.user.id).get();
-  const data = doc.data();
-  const devMode = data?.preferences?.devMode ?? false;
-  const onboardingDismissed = data?.preferences?.onboardingDismissed ?? false;
-  const onboardingChecklistChecked = data?.preferences?.onboardingChecklistChecked ?? {};
-  const web3Mode = data?.preferences?.web3Mode ?? false;
-  const walletAddress = data?.preferences?.walletAddress ?? null;
-  const governanceConfig = data?.preferences?.governanceConfig ?? null;
-  return NextResponse.json({
-    preferences: { devMode, onboardingDismissed, onboardingChecklistChecked, web3Mode, walletAddress, governanceConfig },
-  });
+    const doc = await db.collection("user_settings").doc(session.user.id).get();
+    const data = doc.data();
+    const devMode = data?.preferences?.devMode ?? false;
+    const onboardingDismissed = data?.preferences?.onboardingDismissed ?? false;
+    const onboardingChecklistChecked = data?.preferences?.onboardingChecklistChecked ?? {};
+    const web3Mode = data?.preferences?.web3Mode ?? false;
+    const walletAddress = data?.preferences?.walletAddress ?? null;
+    const governanceConfig = data?.preferences?.governanceConfig ?? null;
+    const brandColors = data?.preferences?.brandColors ?? {
+      primary: "#22c55e", // Default brand green
+      secondary: "#166534",
+      accent: "#22c55e",
+    };
+    return NextResponse.json({
+      preferences: { 
+        devMode, 
+        onboardingDismissed, 
+        onboardingChecklistChecked, 
+        web3Mode, 
+        walletAddress, 
+        governanceConfig,
+        brandColors
+      },
+    });
+  } catch (error) {
+    console.error("Preferences GET error:", error);
+    return NextResponse.json({ 
+      preferences: { devMode: false, web3Mode: false },
+      error: "Failed to fetch preferences" 
+    });
+  }
 }
 
 export async function PATCH(req: NextRequest) {

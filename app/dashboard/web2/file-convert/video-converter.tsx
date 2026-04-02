@@ -35,10 +35,11 @@ export function VideoConverter() {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const initFFmpeg = async () => {
-    const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-    const { fetchFile } = await import("@ffmpeg/util");
+    // Load from CDN at runtime to avoid bundling ~30MB FFmpeg.wasm in deployment
+    const { FFmpeg } = await import(/* webpackIgnore: true */ "https://esm.sh/@ffmpeg/ffmpeg@0.12.6");
+    const { fetchFile } = await import(/* webpackIgnore: true */ "https://esm.sh/@ffmpeg/util@0.12.1");
     const ffmpeg = new FFmpeg();
-    ffmpeg.on("progress", ({ progress: p }) => setProgress(Math.round(p * 100)));
+    ffmpeg.on("progress", ({ progress: p }) => setProgress(Math.round((p ?? 0) * 100)));
     await ffmpeg.load();
     return { ffmpeg, fetchFile };
   };

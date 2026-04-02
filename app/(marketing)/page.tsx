@@ -11,6 +11,7 @@ import { HoverCard } from "@/components/marketing/hover-card";
 import { FeatureCard } from "@/components/marketing/feature-card";
 import { ProcessTabs } from "@/components/marketing/process-tabs";
 import { IntakeForm } from "@/components/intake/intake-form";
+import { DashboardMockup } from "@/components/marketing/dashboard-mockup";
 import {
   ArrowRight,
   CheckCircle,
@@ -27,28 +28,28 @@ import {
 
 const features = [
   {
-    icon: "ShoppingBag" as const,
-    title: "Ecommerce & Shopify",
-    description:
-      "We've built 100+ Shopify stores and ecommerce sites. From simple setups to complex customizations—we know stores inside out.",
-  },
-  {
     icon: "Code2" as const,
-    title: "Web & App Development",
+    title: "Custom Web & Apps",
     description:
-      "Custom web apps, SaaS products, and websites with React, Next.js, and modern tech. Not just ecommerce.",
+      "Bespoke websites, SaaS platforms, and digital products built with React and Next.js. Fast, secure, and built to scale.",
   },
   {
-    icon: "Palette" as const,
-    title: "Stunning Design",
+    icon: "ShoppingBag" as const,
+    title: "E-Commerce Solutions",
     description:
-      "Beautiful, conversion-focused design that makes your brand stand out—for stores, apps, or marketing sites.",
+      "Custom storefronts on Shopify, Next.js Commerce, or fully bespoke. Platform-agnostic builds tailored to your needs.",
   },
   {
-    icon: "Rocket" as const,
-    title: "Fast Delivery",
+    icon: "Smartphone" as const,
+    title: "Mobile Development",
     description:
-      "We respect your time. Most projects launch within 2-4 weeks, not months.",
+      "Cross-platform mobile apps for iOS and Android using React Native. One codebase, native performance.",
+  },
+  {
+    icon: "Zap" as const,
+    title: "Performance First",
+    description:
+      "We focus on speed and SEO. Our builds achieve perfect Lighthouse scores and are optimized for search engines.",
   },
 ];
 
@@ -280,6 +281,50 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* SaaS Dashboard Preview Section */}
+      <section className="section-padding bg-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.05),transparent)] pointer-events-none" />
+        <div className="container-width relative">
+          <MotionAnimateIn animation="fadeUp">
+            <div className="text-center mb-12">
+              <Badge variant="secondary" className="mb-4 bg-brand-green/10 text-brand-green border border-brand-green/20">
+                Exclusive SaaS Tools
+              </Badge>
+              <h2 className="text-3xl sm:text-4xl font-medium mb-4">
+                Manage your growth from one dashboard
+              </h2>
+              <p className="text-text-secondary max-w-2xl mx-auto mb-10">
+                Every project comes with access to our proprietary dashboard. Track your sites, 
+                manage support, view invoices, and use powerful ecommerce tools—all in one place.
+              </p>
+            </div>
+          </MotionAnimateIn>
+
+          <MotionAnimateIn animation="fadeUp" delay={200}>
+            <DashboardMockup />
+          </MotionAnimateIn>
+          
+          <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+              <div className="text-2xl font-bold text-brand-green">24/7</div>
+              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Support Access</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-brand-green">Real-time</div>
+              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Analytics</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-brand-green">Secure</div>
+              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Asset Vault</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-brand-green">Easy</div>
+              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Billing</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section — Why choose merchantmagix */}
       <section className="section-padding relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_20%_50%,rgba(34,197,94,0.04),transparent)] pointer-events-none" />
@@ -332,52 +377,6 @@ export default function HomePage() {
           <MotionAnimateIn animation="fadeUp" delay={100}>
             <ProcessTabs steps={processSteps} />
           </MotionAnimateIn>
-        </div>
-      </section>
-
-      {/* Shopify Apps Section */}
-      <section className="section-padding bg-surface">
-        <div className="container-width">
-          <MotionAnimateIn animation="fadeUp" rootMargin="0px 0px -60px 0px">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl sm:text-4xl font-medium mb-4">
-                Our Shopify Mini Apps
-              </h2>
-              <p className="text-text-secondary max-w-2xl mx-auto">
-                Power your store with our own Shopify apps. More coming soon.
-              </p>
-            </div>
-          </MotionAnimateIn>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {[
-              { name: "App One", tagline: "Coming soon", icon: Package },
-              { name: "App Two", tagline: "Coming soon", icon: Package },
-              { name: "App Three", tagline: "Coming soon", icon: Package },
-              { name: "App Four", tagline: "Coming soon", icon: Package },
-            ].map((app, i) => (
-              <MotionAnimateIn key={app.name} delay={i * 80} animation="fadeUp">
-                <HoverCard className="h-full">
-                  <CardContent className="p-6 flex flex-col items-center text-center">
-                    <div className="h-12 w-12 rounded-xl bg-brand-green/20 flex items-center justify-center mb-4 group-hover:bg-brand-green/30 transition-colors">
-                      <app.icon className="h-6 w-6 text-brand-green" />
-                    </div>
-                    <h3 className="text-lg font-medium mb-1">{app.name}</h3>
-                    <p className="text-sm text-text-muted mb-4">{app.tagline}</p>
-                    <Badge variant="secondary" className="text-xs">
-                      Shopify
-                    </Badge>
-                  </CardContent>
-                </HoverCard>
-              </MotionAnimateIn>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <AnimatedCta href="/apps" variant="primary" size="lg">
-              View All Apps
-            </AnimatedCta>
-          </div>
         </div>
       </section>
 

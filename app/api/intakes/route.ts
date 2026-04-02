@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/firebase-session";
 import { createIntake, getIntakesByUser, getIntakesForAdmin } from "@/lib/firestore";
+import { sendIntakeNotification } from "@/lib/email";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -49,6 +50,15 @@ export async function POST(request: Request) {
       ...parsed,
       ownerId,
     });
+
+    // Notify admin - don't await so it doesn't slow down the response
+    sendIntakeNotification({
+      contactName: parsed.contactName,
+      contactEmail: parsed.contactEmail,
+      projectType: parsed.projectType,
+      businessName: parsed.businessName,
+      budget: parsed.budget,
+    }).catch(err => console.error("Failed to send intake notification:", err));
 
     return NextResponse.json(intake);
   } catch (error) {

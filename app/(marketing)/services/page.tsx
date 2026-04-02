@@ -3,122 +3,132 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
-  ShoppingBag,
+  Globe,
   Code2,
   Palette,
   LineChart,
   Wrench,
   Headphones,
+  Smartphone,
+  ShoppingBag,
   CheckCircle,
   ArrowRight,
 } from "lucide-react";
+import { FloatingTechStack } from "@/components/marketing/floating-tech-stack";
 
 const services = [
   {
-    id: "shopify",
-    icon: ShoppingBag,
-    title: "Shopify Development",
+    id: "custom-website",
+    icon: Globe,
+    title: "Custom Websites",
+    badge: "Most Popular",
     description:
-      "Expert Shopify store setup and customization. From theme selection to full custom builds with Liquid.",
+      "Bespoke marketing sites, portfolios, and content platforms built with React and Next.js. Fast, SEO-ready, and designed to convert.",
     features: [
-      "Theme customization & setup",
-      "Custom Liquid development",
-      "App integrations",
-      "Shopify Plus expertise",
-      "Store migrations",
-      "Performance optimization",
+      "100% custom design",
+      "React / Next.js development",
+      "SEO & Core Web Vitals optimised",
+      "CMS integration (Sanity, Contentful)",
+      "Animations & micro-interactions",
+      "Hosting on Vercel (often free)",
     ],
   },
   {
-    id: "custom",
+    id: "web-app",
     icon: Code2,
-    title: "Custom Ecommerce",
+    title: "Web Apps & SaaS",
+    badge: null,
     description:
-      "Fully custom ecommerce solutions built with modern technologies. Perfect for unique requirements.",
+      "Full-stack product development — from MVP to production-ready SaaS. Auth, databases, dashboards, and APIs built to scale.",
     features: [
-      "React & Next.js development",
-      "Headless commerce (Shopify, Sanity)",
-      "Custom checkout flows",
-      "API integrations",
-      "Scalable architecture",
-      "Progressive Web Apps",
+      "React / Next.js frontend",
+      "Node.js / Prisma backend",
+      "Auth (NextAuth, Firebase)",
+      "PostgreSQL / Firestore",
+      "REST & GraphQL APIs",
+      "Admin dashboards",
+    ],
+  },
+  {
+    id: "mobile",
+    icon: Smartphone,
+    title: "Mobile Apps",
+    badge: null,
+    description:
+      "Cross-platform mobile apps built with React Native. One codebase, native performance on iOS and Android.",
+    features: [
+      "React Native (iOS & Android)",
+      "App Store & Play Store publishing",
+      "Push notifications",
+      "Offline-first architecture",
+      "Device integrations (camera, GPS)",
+      "Shared codebase with web",
+    ],
+  },
+  {
+    id: "ecommerce",
+    icon: ShoppingBag,
+    title: "E-Commerce",
+    badge: null,
+    description:
+      "Custom storefronts on any platform — Shopify, headless Next.js Commerce, WooCommerce, or fully bespoke. We're platform-agnostic.",
+    features: [
+      "Custom storefront design",
+      "Shopify / WooCommerce / headless",
+      "Checkout & payment setup",
+      "Product & inventory management",
+      "Store migrations",
+      "Conversion optimisation",
     ],
   },
   {
     id: "design",
     icon: Palette,
     title: "UI/UX Design",
+    badge: null,
     description:
-      "Conversion-focused design that looks beautiful and drives sales. Every pixel with purpose.",
+      "Conversion-focused digital design. From brand identity to interactive prototypes — every pixel serves a purpose.",
     features: [
-      "Brand identity design",
-      "UI/UX design",
+      "Brand identity & logo",
+      "UI/UX design (Figma)",
       "Wireframing & prototyping",
-      "Mobile-first design",
       "Design systems",
+      "Mobile-first",
       "A/B testing designs",
-    ],
-  },
-  {
-    id: "strategy",
-    icon: LineChart,
-    title: "Ecommerce Strategy",
-    description:
-      "Data-driven strategies to increase conversions, average order value, and customer lifetime value.",
-    features: [
-      "Conversion rate optimization",
-      "Analytics setup & insights",
-      "Customer journey mapping",
-      "Competitor analysis",
-      "Growth roadmapping",
-      "Tech stack consulting",
-    ],
-  },
-  {
-    id: "maintenance",
-    icon: Wrench,
-    title: "Maintenance & Updates",
-    description:
-      "Keep your store running smoothly with ongoing maintenance, updates, and improvements.",
-    features: [
-      "Security updates",
-      "Performance monitoring",
-      "Bug fixes",
-      "Feature updates",
-      "Backup management",
-      "Uptime monitoring",
     ],
   },
   {
     id: "support",
     icon: Headphones,
-    title: "Ongoing Support",
+    title: "Maintenance & Support",
+    badge: null,
     description:
-      "Dedicated support when you need it. Quick responses and reliable solutions.",
+      "Ongoing care for your digital products — updates, monitoring, and fast responses when you need them.",
     features: [
       "Priority support tickets",
-      "Slack/email support",
+      "Security updates",
+      "Performance monitoring",
+      "Feature updates",
       "Monthly check-ins",
-      "Training sessions",
-      "Documentation",
-      "Emergency support",
+      "Emergency hotfixes",
     ],
   },
 ];
 
 const techStack = [
-  { name: "Shopify", category: "Platform" },
-  { name: "Shopify Plus", category: "Platform" },
   { name: "React", category: "Frontend" },
   { name: "Next.js", category: "Frontend" },
   { name: "TypeScript", category: "Frontend" },
+  { name: "React Native", category: "Mobile" },
   { name: "Tailwind CSS", category: "Styling" },
-  { name: "Sanity", category: "CMS" },
-  { name: "Contentful", category: "CMS" },
-  { name: "Stripe", category: "Payments" },
-  { name: "Klaviyo", category: "Marketing" },
-  { name: "Vercel", category: "Hosting" },
+  { name: "Node.js", category: "Backend" },
+  { name: "Prisma", category: "Database" },
   { name: "PostgreSQL", category: "Database" },
+  { name: "Firebase", category: "Backend" },
+  { name: "Sanity", category: "CMS" },
+  { name: "Shopify", category: "E-Commerce" },
+  { name: "Stripe", category: "Payments" },
+  { name: "Vercel", category: "Hosting" },
 ];
 
 export default function ServicesPage() {
@@ -130,12 +140,12 @@ export default function ServicesPage() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <Badge className="mb-4">Our Services</Badge>
             <h1 className="text-4xl sm:text-5xl font-medium mb-6">
-              Everything you need to{" "}
-              <span className="gradient-text">sell online</span>
+              Custom websites, apps,{" "}
+              <span className="gradient-text">and everything in between</span>
             </h1>
             <p className="text-lg text-text-secondary">
-              From strategy to launch and beyond. We handle every aspect of your
-              ecommerce presence so you can focus on your business.
+              We design and build digital products — from marketing sites and SaaS platforms
+              to mobile apps and custom e-commerce storefronts. No templates, no shortcuts.
             </p>
           </div>
         </div>
@@ -149,22 +159,24 @@ export default function ServicesPage() {
               <Card
                 key={service.id}
                 id={service.id}
-                className="group hover:border-brand-green/50 transition-colors scroll-mt-24"
+                className="group hover:border-brand-green/50 transition-colors scroll-mt-24 relative"
               >
+                {service.badge && (
+                  <div className="absolute -top-2.5 left-4">
+                    <Badge className="bg-brand-green text-black text-xs font-semibold">
+                      {service.badge}
+                    </Badge>
+                  </div>
+                )}
                 <CardContent className="p-6">
                   <div className="h-12 w-12 rounded-xl bg-brand-green/20 flex items-center justify-center mb-4 group-hover:bg-brand-green/30 transition-colors">
                     <service.icon className="h-6 w-6 text-brand-green" />
                   </div>
                   <h3 className="text-xl font-medium mb-2">{service.title}</h3>
-                  <p className="text-text-secondary text-sm mb-4">
-                    {service.description}
-                  </p>
+                  <p className="text-text-secondary text-sm mb-4">{service.description}</p>
                   <ul className="space-y-2">
                     {service.features.map((feature) => (
-                      <li
-                        key={feature}
-                        className="flex items-center gap-2 text-sm text-text-secondary"
-                      >
+                      <li key={feature} className="flex items-center gap-2 text-sm text-text-secondary">
                         <CheckCircle className="h-4 w-4 text-brand-green shrink-0" />
                         {feature}
                       </li>
@@ -177,24 +189,20 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Tech Stack Section */}
-      <section className="section-padding bg-surface">
+      {/* Tech Stack Section — Interactive & Floating */}
+      <section className="section-padding bg-surface overflow-hidden">
         <div className="container-width">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-medium mb-4">Our Tech Stack</h2>
+            <h2 className="text-3xl font-medium mb-4 underline decoration-brand-green/30 underline-offset-8">
+              Our Tech Stack
+            </h2>
             <p className="text-text-secondary max-w-2xl mx-auto">
-              We use modern, battle-tested technologies that scale with your
-              business
+              Modern, battle-tested tools chosen for performance, developer experience, 
+              and long-term maintainability. Hover to interact.
             </p>
           </div>
-
-          <div className="flex flex-wrap justify-center gap-3 max-w-3xl mx-auto">
-            {techStack.map((tech) => (
-              <Badge key={tech.name} variant="secondary" className="text-sm py-2 px-4">
-                {tech.name}
-              </Badge>
-            ))}
-          </div>
+          
+          <FloatingTechStack />
         </div>
       </section>
 
@@ -202,12 +210,11 @@ export default function ServicesPage() {
       <section className="section-padding">
         <div className="container-width">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-medium mb-4">Our Process</h2>
+            <h2 className="text-3xl font-medium mb-4">How We Work</h2>
             <p className="text-text-secondary max-w-2xl mx-auto">
               A proven process that delivers results on time, every time
             </p>
           </div>
-
           <div className="max-w-4xl mx-auto">
             <div className="space-y-8">
               {[
@@ -215,28 +222,28 @@ export default function ServicesPage() {
                   step: "01",
                   title: "Discovery & Strategy",
                   description:
-                    "We start with a deep dive into your business, goals, target audience, and competitors. This shapes everything we build.",
+                    "We start with a deep dive into your business, goals, target audience, and existing tech. This shapes everything we build.",
                   duration: "1 week",
                 },
                 {
                   step: "02",
                   title: "Design & Prototyping",
                   description:
-                    "Custom designs created specifically for your brand. You'll see interactive prototypes before any code is written.",
-                  duration: "1-2 weeks",
+                    "Custom designs tailored to your brand. You'll review interactive prototypes before a single line of code is written.",
+                  duration: "1–2 weeks",
                 },
                 {
                   step: "03",
                   title: "Development & Testing",
                   description:
-                    "We build your store with clean, efficient code. Rigorous testing ensures everything works perfectly.",
-                  duration: "2-3 weeks",
+                    "We build with clean, scalable code. Rigorous QA across devices and browsers ensures everything works perfectly.",
+                  duration: "2–4 weeks",
                 },
                 {
                   step: "04",
                   title: "Launch & Support",
                   description:
-                    "Smooth launch with full support. We stick around to make sure everything runs perfectly.",
+                    "Smooth handoff with full documentation and post-launch support. We're here if anything needs attention.",
                   duration: "1 week",
                 },
               ].map((phase, index) => (
@@ -245,9 +252,7 @@ export default function ServicesPage() {
                     <div className="w-12 h-12 rounded-full bg-brand-green/20 flex items-center justify-center text-brand-green font-medium">
                       {phase.step}
                     </div>
-                    {index < 3 && (
-                      <div className="w-px h-full bg-border mt-2" />
-                    )}
+                    {index < 3 && <div className="w-px h-full bg-border mt-2" />}
                   </div>
                   <div className="flex-1 pb-8">
                     <div className="flex items-center gap-3 mb-2">
@@ -269,10 +274,10 @@ export default function ServicesPage() {
           <Card className="bg-gradient-to-br from-brand-green/20 via-transparent to-transparent border-brand-green/30">
             <CardContent className="p-8 md:p-12 text-center">
               <h2 className="text-3xl font-medium mb-4">
-                Ready to grow your ecommerce business?
+                Ready to build something great?
               </h2>
               <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-                Let&apos;s discuss how we can help you achieve your goals.
+                Tell us about your project and we&apos;ll get back to you within 24 hours with a plan.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="xl" asChild>

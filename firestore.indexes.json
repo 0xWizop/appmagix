@@ -25,13 +25,6 @@
       ]
     },
     {
-      "collectionGroup": "projects",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "siteToken", "order": "ASCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "tickets",
       "queryScope": "COLLECTION",
       "fields": [

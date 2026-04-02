@@ -1,0 +1,19 @@
+# Reduce Cloud Functions deployment size
+# Exclude large packages and unnecessary files
+node_modules/@ffmpeg/
+node_modules/ffmpeg*
+.git/
+.firebase/
+*.md
+*.log
+.env.local
+.env.*.local
+coverage/
+.nyc_output/
+__tests__/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+scripts/
+.next/cache/

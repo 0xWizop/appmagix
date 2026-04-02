@@ -29,21 +29,19 @@ import {
   Users,
   Users2,
   FileText,
-  Package,
   Wrench,
   ArrowLeftRight,
-  Send,
   FilePlus2,
   Inbox,
   Activity,
   Wallet,
   Vote,
-  Search,
+  CalendarDays,
+  Shield,
 } from "lucide-react";
 
 const clientTopNav = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Analytics", href: "/dashboard/web2/analytics", icon: BarChart3 },
 ];
 
 const clientProjectsSection = [
@@ -51,27 +49,28 @@ const clientProjectsSection = [
   { name: "Projects", href: "/dashboard/web2/projects", icon: FolderKanban },
 ];
 
-const clientTrackSection = [
-  { name: "Tools", href: "/dashboard/web2/tools", icon: Search },
-  { name: "Apps", href: "/dashboard/web2/apps", icon: Package },
-  { name: "File Convert", href: "/dashboard/web2/file-convert", icon: ArrowLeftRight },
-  { name: "Support", href: "/dashboard/web2/support", icon: MessageSquare },
-  { name: "Billing", href: "/dashboard/web2/billing", icon: CreditCard },
+const clientSaasSection = [
+  { name: "Sites & Analytics", href: "/dashboard/web2/analytics", icon: BarChart3 },
+  { name: "Reports", href: "/dashboard/web2/reports", icon: FileText },
 ];
+
 
 const clientPeopleSection = [
   { name: "CRM", href: "/dashboard/web2/crm", icon: Users2 },
   { name: "Team", href: "/dashboard/web2/team", icon: Users },
+  { name: "Booking", href: "/dashboard/web2/booking", icon: CalendarDays },
+  { name: "Support", href: "/dashboard/web2/support", icon: MessageSquare },
+  { name: "Billing", href: "/dashboard/web2/billing", icon: CreditCard },
+  { name: "Brand Vault", href: "/dashboard/web2/brand-vault", icon: Shield },
 ];
 
-const clientNavigationDev = [
-  { name: "Playground", href: "/dashboard/web2/playground", icon: Wrench },
-  { name: "API Builder", href: "/dashboard/web2/api-builder", icon: Send },
+const clientToolsSection = [
+  { name: "File convert", href: "/dashboard/web2/file-convert", icon: ArrowLeftRight },
+  { name: "Mini Tools", href: "/dashboard/web2/tools", icon: Wrench },
 ];
 
 const adminTopNav = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Analytics", href: "/dashboard/web2/analytics", icon: BarChart3 },
 ];
 
 const adminProjectsSection = [
@@ -79,25 +78,26 @@ const adminProjectsSection = [
   { name: "Projects", href: "/dashboard/web2/projects", icon: FolderKanban },
 ];
 
-const adminTrackSection = [
-  { name: "Tools", href: "/dashboard/web2/tools", icon: Search },
-  { name: "Apps", href: "/dashboard/web2/apps", icon: Package },
-  { name: "File Convert", href: "/dashboard/web2/file-convert", icon: ArrowLeftRight },
-  { name: "Clients", href: "/dashboard/web2/admin/clients", icon: Users },
-  { name: "Tickets", href: "/dashboard/web2/admin/tickets", icon: MessageSquare },
-  { name: "Invoices", href: "/dashboard/web2/admin/invoices", icon: FileText },
-  { name: "Support", href: "/dashboard/web2/support", icon: MessageSquare },
-  { name: "Billing", href: "/dashboard/web2/billing", icon: CreditCard },
+const adminSaasSection = [
+  { name: "Sites & Analytics", href: "/dashboard/web2/analytics", icon: BarChart3 },
+  { name: "Reports", href: "/dashboard/web2/reports", icon: FileText },
+];
+
+const adminToolsSection = [
+  { name: "File convert", href: "/dashboard/web2/file-convert", icon: ArrowLeftRight },
+  { name: "Mini Tools", href: "/dashboard/web2/tools", icon: Wrench },
 ];
 
 const adminPeopleSection = [
   { name: "CRM", href: "/dashboard/web2/crm", icon: Users2 },
   { name: "Team", href: "/dashboard/web2/team", icon: Users },
-];
-
-const adminNavigationDev = [
-  { name: "Playground", href: "/dashboard/web2/playground", icon: Wrench },
-  { name: "API Builder", href: "/dashboard/web2/api-builder", icon: Send },
+  { name: "Booking", href: "/dashboard/web2/booking", icon: CalendarDays },
+  { name: "Clients", href: "/dashboard/web2/admin/clients", icon: Users },
+  { name: "Tickets", href: "/dashboard/web2/admin/tickets", icon: MessageSquare },
+  { name: "Invoices", href: "/dashboard/web2/admin/invoices", icon: FileText },
+  { name: "Support", href: "/dashboard/web2/support", icon: MessageSquare },
+  { name: "Billing", href: "/dashboard/web2/billing", icon: CreditCard },
+  { name: "Brand Vault", href: "/dashboard/web2/brand-vault", icon: Shield },
 ];
 
 const web3Navigation = [
@@ -127,9 +127,9 @@ export function Sidebar() {
   const isAdmin = user?.role === "ADMIN";
   const topNav = isAdmin ? adminTopNav : clientTopNav;
   const projectsSection = isAdmin ? adminProjectsSection : clientProjectsSection;
-  const trackSection = isAdmin ? adminTrackSection : clientTrackSection;
+  const saasSection = isAdmin ? adminSaasSection : clientSaasSection;
+  const toolsSection = isAdmin ? adminToolsSection : clientToolsSection;
   const peopleSection = isAdmin ? adminPeopleSection : clientPeopleSection;
-  const devNav = clientNavigationDev;
 
   const getInitials = (name?: string | null) => {
     if (!name) return "U";
@@ -243,8 +243,8 @@ export function Sidebar() {
               })}
             </div>
             <div className="pt-2">
-              <div className="px-3 py-1 text-xs font-medium text-text-muted">Tools</div>
-              {trackSection.map((item) => {
+              <div className="px-3 py-1 text-xs font-medium text-text-muted">SaaS</div>
+              {saasSection.map((item) => {
                 const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                 return (
                   <Link
@@ -253,8 +253,8 @@ export function Sidebar() {
                     className={cn(
                       "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ml-2 border-l-2 border-transparent",
                       isActive
-                        ? "bg-brand-green/20 text-brand-green border-brand-green"
-                        : "text-text-secondary hover:bg-brand-green/20 hover:text-brand-green"
+                        ? "bg-brand-green-dark text-white border-brand-green"
+                        : "text-text-secondary hover:bg-surface-hover hover:text-brand-green"
                     )}
                   >
                     <item.icon className="h-5 w-5" />
@@ -263,32 +263,27 @@ export function Sidebar() {
                 );
               })}
             </div>
-          </>
-        )}
-        {!web3Mode && (
-          <>
-            <Separator className="my-2" />
-            <div className="px-3 py-1 text-xs font-medium text-text-muted">Developer</div>
-            {devNav.map((item) => {
-              const isActive = item.href === "/dashboard"
-                ? pathname === "/dashboard"
-                : pathname === item.href || pathname.startsWith(`${item.href}/`);
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-brand-green/20 text-brand-green"
-                      : "text-text-secondary hover:bg-brand-green/20 hover:text-brand-green"
-                  )}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.name}
-                </Link>
-              );
-            })}
+            <div className="pt-2">
+              <div className="px-3 py-1 text-xs font-medium text-text-muted">Tools</div>
+              {toolsSection.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ml-2 border-l-2 border-transparent",
+                      isActive
+                        ? "bg-brand-green-dark text-white border-brand-green"
+                        : "text-text-secondary hover:bg-surface-hover hover:text-brand-green"
+                    )}
+                  >
+                    <item.icon className="h-5 w-5" />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </div>
           </>
         )}
       </nav>
@@ -359,7 +354,9 @@ export function Sidebar() {
                   {user?.displayName || "User"}
                 </div>
                 <div className="text-xs text-text-muted truncate">
-                  {user?.email}
+                  {user?.email && !user.email.endsWith("@placeholder.local")
+                    ? user.email
+                    : null}
                 </div>
               </div>
               <ChevronDown className="h-4 w-4 text-text-muted" />

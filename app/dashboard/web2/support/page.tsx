@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { getSession } from "@/lib/firebase-session";
-import { getTicketsByUser } from "@/lib/firestore";
+import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
+import { getTicketsByPrismaUserId } from "@/lib/db-tickets";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { MessageSquare, Plus, Clock, AlertCircle } from "lucide-react";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { PageTips } from "@/components/dashboard/page-tips";
 
 const statusColors: Record<string, "default" | "secondary" | "outline"> = {
   OPEN: "default",
@@ -22,12 +24,16 @@ const priorityColors: Record<string, "default" | "secondary" | "outline"> = {
 
 export default async function SupportPage() {
   const session = await getSession();
-  
-  let tickets: Awaited<ReturnType<typeof getTicketsByUser>> = [];
-  
+  let tickets: Awaited<ReturnType<typeof getTicketsByPrismaUserId>> = [];
+
   try {
     if (session?.user?.id) {
-      tickets = await getTicketsByUser(session.user.id);
+      const user = await getOrCreateUserByFirebaseUid(
+        session.user.id,
+        session.user.email,
+        session.user.name
+      );
+      tickets = await getTicketsByPrismaUserId(user.id);
     }
   } catch (error) {
     console.error("Error fetching tickets:", error);
@@ -49,10 +55,11 @@ export default async function SupportPage() {
           </Link>
         </Button>
       </div>
+      <PageTips />
 
       {/* Stats */}
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border-border/50">
+        <Card className="border-border">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -63,7 +70,7 @@ export default async function SupportPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-border/50">
+        <Card className="border-border">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -76,7 +83,7 @@ export default async function SupportPage() {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-border/50">
+        <Card className="border-border">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -103,7 +110,7 @@ export default async function SupportPage() {
                     href={`/dashboard/web2/support/${ticket.id}`}
                     className="block"
                   >
-                    <Card className="hover:border-border/80 transition-colors border-border/50">
+                    <Card className="hover:border-border transition-colors border-border">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">
@@ -149,7 +156,7 @@ export default async function SupportPage() {
                     href={`/dashboard/web2/support/${ticket.id}`}
                     className="block"
                   >
-                    <Card className="hover:border-border/80 transition-colors opacity-80 border-border/50">
+                    <Card className="hover:border-border transition-colors opacity-80 border-border">
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex-1 min-w-0">

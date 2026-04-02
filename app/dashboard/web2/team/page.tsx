@@ -1,5 +1,5 @@
 import { getSession } from "@/lib/firebase-session";
-import { getTeamData } from "@/lib/firestore";
+import { getTeamDataByOwnerId } from "@/lib/db-team";
 import { TeamPageClient } from "./team-client";
 
 export default async function TeamPage() {
@@ -9,7 +9,7 @@ export default async function TeamPage() {
   let teamData = null;
   if (userId) {
     try {
-      teamData = await getTeamData(userId);
+      teamData = await getTeamDataByOwnerId(userId);
     } catch (e) {
       console.error("Team data error:", e);
     }

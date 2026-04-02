@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CheckCircle, Loader2, Link2, Copy, ExternalLink } from "lucide-react";
+import { HelpTooltip } from "@/components/dashboard/help-tooltip";
+import { DASHBOARD_HELP } from "@/lib/dashboard-help";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || (typeof window !== "undefined" ? window.location.origin : "");
 
@@ -130,6 +132,7 @@ export function ConnectSiteCard({ projectId, websiteUrl, siteVerifiedAt }: Conne
         <CardTitle className="flex items-center gap-2">
           <Link2 className="h-5 w-5 text-brand-green" />
           Connect Your Site
+          <HelpTooltip content={DASHBOARD_HELP.analytics.connectSite} side="bottom" />
         </CardTitle>
         <CardDescription>
           Add your site to enable analytics. Add the meta tag and script to your site&apos;s &lt;head&gt;.

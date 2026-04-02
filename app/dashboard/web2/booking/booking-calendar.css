@@ -1,0 +1,261 @@
+/* Dark theme overrides for react-big-calendar – no white lines, modern look */
+
+/* App green: #22c55e (brand-green) – bright, not dark */
+.booking-calendar-dark {
+  --rbc-bg: rgb(24, 24, 27);
+  --rbc-border: rgb(39, 39, 42);
+  --rbc-text: rgb(250, 250, 250);
+  --rbc-text-muted: rgb(161, 161, 170);
+  --rbc-text-dim: rgb(113, 113, 122);
+  --rbc-today: #22c55e;
+  --rbc-event: #22c55e;
+  --rbc-hover: rgb(39, 39, 42);
+}
+
+.booking-calendar-dark .rbc-calendar {
+  background: var(--rbc-bg);
+  color: var(--rbc-text);
+}
+
+/* Toolbar – minimal, no heavy borders */
+.booking-calendar-dark .rbc-toolbar {
+  margin-bottom: 1.25rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.booking-calendar-dark .rbc-toolbar-label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--rbc-text);
+  min-width: 140px;
+}
+
+.booking-calendar-dark .rbc-toolbar button {
+  color: var(--rbc-text-muted);
+  background: var(--rbc-bg);
+  border: 1px solid var(--rbc-border);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.booking-calendar-dark .rbc-toolbar button:hover {
+  color: var(--rbc-text);
+  background: var(--rbc-hover);
+  border-color: var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-toolbar button:focus {
+  outline: none;
+  border-color: var(--rbc-today);
+  color: var(--rbc-text);
+}
+
+.booking-calendar-dark .rbc-toolbar button.rbc-active {
+  background: var(--rbc-today);
+  color: #fff;
+  border-color: var(--rbc-today);
+  box-shadow: none;
+}
+
+.booking-calendar-dark .rbc-btn-group button + button {
+  margin-left: 0;
+  border-left-width: 0;
+}
+
+.booking-calendar-dark .rbc-btn-group > button:first-child:not(:last-child) {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.booking-calendar-dark .rbc-btn-group > button:last-child:not(:first-child) {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.booking-calendar-dark .rbc-btn-group > button:not(:first-child):not(:last-child) {
+  border-radius: 0;
+}
+
+/* Month view – all borders use dark separator */
+.booking-calendar-dark .rbc-month-view {
+  border: 1px solid var(--rbc-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--rbc-bg);
+}
+
+.booking-calendar-dark .rbc-header {
+  padding: 0.75rem 4px;
+  border-bottom: 1px solid var(--rbc-border);
+  color: var(--rbc-text-muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.booking-calendar-dark .rbc-header + .rbc-header {
+  border-left: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-month-row {
+  border-top: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-month-row + .rbc-month-row {
+  border-top: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-day-bg {
+  background: var(--rbc-bg);
+}
+
+.booking-calendar-dark .rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-off-range-bg {
+  background: rgb(18, 18, 20);
+}
+
+.booking-calendar-dark .rbc-today {
+  background: var(--rbc-today);
+  color: #0a0a0a;
+}
+
+.booking-calendar-dark .rbc-date-cell {
+  padding: 4px 6px;
+  color: var(--rbc-text) !important;
+  font-size: 0.8125rem;
+}
+
+.booking-calendar-dark .rbc-date-cell.rbc-now {
+  color: var(--rbc-text) !important;
+  font-weight: 600;
+}
+
+.booking-calendar-dark .rbc-off-range .rbc-date-cell {
+  color: var(--rbc-text-muted) !important;
+}
+
+.booking-calendar-dark .rbc-row-content {
+  border-top: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-row-segment {
+  padding: 2px 4px;
+}
+
+/* Events */
+.booking-calendar-dark .rbc-event,
+.booking-calendar-dark .rbc-event.rbc-event-solid {
+  background: var(--rbc-event) !important;
+  color: #0a0a0a !important;
+  border: none !important;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+
+.booking-calendar-dark .rbc-event:focus {
+  outline: 2px solid var(--rbc-today);
+  outline-offset: 1px;
+}
+
+.booking-calendar-dark .rbc-show-more {
+  background: var(--rbc-hover);
+  color: var(--rbc-today);
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+.booking-calendar-dark .rbc-show-more:hover {
+  background: var(--rbc-border);
+  color: var(--rbc-text);
+}
+
+/* Time view (week/day) */
+.booking-calendar-dark .rbc-time-view {
+  border: 1px solid var(--rbc-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--rbc-bg);
+}
+
+.booking-calendar-dark .rbc-time-header-content {
+  border-left: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-time-header > .rbc-row:first-child {
+  border-bottom: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-time-content {
+  border-top: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-time-content > * + * > * {
+  border-left: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-timeslot-group {
+  border-bottom: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-time-gutter {
+  color: var(--rbc-text-muted);
+  font-size: 0.75rem;
+}
+
+.booking-calendar-dark .rbc-time-view-resources .rbc-time-gutter,
+.booking-calendar-dark .rbc-time-view-resources .rbc-time-header-gutter {
+  background: var(--rbc-bg);
+  border-right: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-current-time-indicator {
+  background-color: var(--rbc-today);
+}
+
+/* Agenda view */
+.booking-calendar-dark .rbc-agenda-view table.rbc-agenda-table {
+  border: 1px solid var(--rbc-border);
+}
+
+.booking-calendar-dark .rbc-agenda-view table.rbc-agenda-table tbody > tr > td + td,
+.booking-calendar-dark .rbc-agenda-view table.rbc-agenda-table tbody > tr + tr,
+.booking-calendar-dark .rbc-agenda-view table.rbc-agenda-table thead > tr > th {
+  border-color: var(--rbc-border);
+}
+
+/* Overlay (when clicking "show more") */
+.booking-calendar-dark .rbc-overlay {
+  background: var(--rbc-bg);
+  border: 1px solid var(--rbc-border);
+  border-radius: 8px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.booking-calendar-dark .rbc-overlay-header {
+  border-bottom: 1px solid var(--rbc-border);
+  color: var(--rbc-text);
+}
+
+.booking-calendar-dark .rbc-day-bg:hover {
+  background: var(--rbc-today);
+}
+.booking-calendar-dark .rbc-day-bg:hover + .rbc-day-bg {
+  border-left-color: var(--rbc-today);
+}
+.booking-calendar-dark .rbc-selected-cell {
+  background: var(--rbc-today);
+  color: #0a0a0a;
+}

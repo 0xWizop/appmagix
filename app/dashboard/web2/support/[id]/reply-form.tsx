@@ -28,6 +28,7 @@ export function TicketReplyForm({ ticketId }: TicketReplyFormProps) {
       const response = await fetch(`/api/tickets/${ticketId}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ content }),
       });
 

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getSession } from "@/lib/firebase-session";
-import { getProjectsWithMilestones } from "@/lib/firestore";
+import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
+import { db } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,8 +12,11 @@ import {
   Calendar,
   ExternalLink,
   Clock,
+  Globe,
 } from "lucide-react";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { PageTips } from "@/components/dashboard/page-tips";
+import { ProjectsHeader } from "./projects-header";
 
 const statusColors: Record<string, "default" | "secondary" | "success" | "warning" | "info"> = {
   DISCOVERY: "info",
@@ -32,12 +36,31 @@ const statusLabels: Record<string, string> = {
 
 export default async function ProjectsPage() {
   const session = await getSession();
-  
-  let projects: Awaited<ReturnType<typeof getProjectsWithMilestones>> = [];
-  
+  let projects: { id: string; name: string; type: string; status: string; description: string | null; startDate: Date | null; targetLaunchDate: Date | null; websiteUrl: string | null; milestones: { status: string }[] }[] = [];
+
   try {
     if (session?.user?.id) {
-      projects = await getProjectsWithMilestones(session.user.id);
+      const user = await getOrCreateUserByFirebaseUid(
+        session.user.id,
+        session.user.email,
+        session.user.name
+      );
+      const list = await db.project.findMany({
+        where: { userId: user.id },
+        orderBy: { updatedAt: "desc" },
+        include: { milestones: { orderBy: { sortOrder: "asc" } } },
+      });
+      projects = list.map((p) => ({
+        id: p.id,
+        name: p.name,
+        type: p.type,
+        status: p.status,
+        description: p.description,
+        startDate: p.startDate,
+        targetLaunchDate: p.targetLaunchDate,
+        websiteUrl: p.websiteUrl,
+        milestones: p.milestones.map((m) => ({ status: m.status })),
+      }));
     }
   } catch (error) {
     console.error("Error fetching projects:", error);
@@ -51,6 +74,8 @@ export default async function ProjectsPage() {
 
   return (
     <div className="p-6 lg:p-8 space-y-6">
+      <ProjectsHeader />
+      <PageTips />
       {/* Projects Grid */}
       {projects.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2">
@@ -109,6 +134,36 @@ export default async function ProjectsPage() {
                     )}
                   </div>
 
+                  {/* Live site preview */}
+                  {project.websiteUrl && (
+                    <div className="rounded-lg overflow-hidden border border-border bg-surface">
+                      <div className="flex items-center justify-between px-3 py-1.5 border-b border-border bg-surface">
+                        <div className="flex items-center gap-1.5 text-xs text-text-muted">
+                          <Globe className="h-3.5 w-3.5 text-brand-green" />
+                          <span className="truncate max-w-[180px]">{project.websiteUrl.replace(/^https?:\/\//, "")}</span>
+                        </div>
+                        <a
+                          href={project.websiteUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-brand-green hover:underline flex items-center gap-1"
+                        >
+                          Open <ExternalLink className="h-3 w-3" />
+                        </a>
+                      </div>
+                      <div className="relative h-[160px] overflow-hidden">
+                        <iframe
+                          src={project.websiteUrl}
+                          title={`${project.name} preview`}
+                          className="absolute inset-0 w-full h-full border-0 pointer-events-none"
+                          style={{ transform: "scale(0.5)", transformOrigin: "top left", width: "200%", height: "200%" }}
+                          sandbox="allow-scripts allow-same-origin"
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
+                  )}
+
                   {/* Actions */}
                   <div className="flex gap-2 pt-2">
                     <Button asChild className="flex-1">
@@ -138,9 +193,9 @@ export default async function ProjectsPage() {
         <EmptyState
           icon={FolderKanban}
           title="No projects yet"
-          description="Your projects will appear here once we start working together. Ready to build something amazing?"
-          actionLabel="Start a Project"
-          actionHref="/contact"
+          description="Create a project to track progress and milestones."
+          actionLabel="Create project"
+          actionHref="/dashboard/web2/projects/new"
         />
       )}
     </div>
