@@ -48,7 +48,7 @@ export async function POST(request: Request) {
 
     const intake = await createIntake({
       ...parsed,
-      ownerId,
+      ownerId: ownerId,
     });
 
     // Notify admin - don't await so it doesn't slow down the response

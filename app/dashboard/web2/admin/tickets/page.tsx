@@ -1,10 +1,9 @@
-import Link from "next/link";
 import { db } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { MessageSquare, AlertCircle, Clock, CheckCircle } from "lucide-react";
+import { TicketRowActions } from "./ticket-row-actions";
 
 const statusColors: Record<string, "default" | "secondary" | "success" | "warning" | "info"> = {
   OPEN: "warning",
@@ -173,11 +172,7 @@ export default async function AdminTicketsPage() {
                         {formatDate(ticket.createdAt)}
                       </td>
                       <td className="p-4 text-right">
-                        <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/dashboard/web2/admin/tickets/${ticket.id}`}>
-                            View
-                          </Link>
-                        </Button>
+                        <TicketRowActions ticketId={ticket.id} status={ticket.status} />
                       </td>
                     </tr>
                   ))}

@@ -9,7 +9,7 @@ import { getPageTips, type PageTip, type WorkflowStep } from "@/lib/dashboard-he
 import { Lightbulb, ArrowRight, ChevronRight, X, PanelRightOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const STORAGE_KEY = "merchantmagix-page-tips-dismissed";
+const STORAGE_KEY = "webmint-page-tips-dismissed";
 
 function getDismissedPaths(): Record<string, boolean> {
   if (typeof window === "undefined") return {};

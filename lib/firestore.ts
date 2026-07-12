@@ -64,226 +64,6 @@ export interface FirestoreMessage {
   sender?: { displayName?: string; email?: string; photoURL?: string; role?: string };
 }
 
-export interface FirestoreContact {
-  id: string;
-  ownerId: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  company?: string;
-  notes?: string;
-  stage?: string;
-  projectId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface FirestoreSite {
-  id: string;
-  ownerId: string;
-  domain: string;
-  siteToken: string;
-  verifiedAt?: Date;
-  projectId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export async function getContactsByOwner(ownerId: string): Promise<FirestoreContact[]> {
-  if (!adminApp) return [];
-  const snapshot = await db()
-    .collection("contacts")
-    .where("ownerId", "==", ownerId)
-    .orderBy("createdAt", "desc")
-    .get();
-
-  return snapshot.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      ownerId: data.ownerId,
-      name: data.name ?? "",
-      email: data.email,
-      phone: data.phone,
-      company: data.company,
-      notes: data.notes,
-      stage: data.stage ?? "LEAD",
-      projectId: data.projectId,
-      createdAt: toDate(data.createdAt),
-      updatedAt: toDate(data.updatedAt),
-    };
-  });
-}
-
-export async function getSitesByOwner(ownerId: string): Promise<FirestoreSite[]> {
-  if (!adminApp) return [];
-  const snapshot = await db()
-    .collection("sites")
-    .where("ownerId", "==", ownerId)
-    .orderBy("createdAt", "desc")
-    .get();
-
-  return snapshot.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      ownerId: data.ownerId,
-      domain: data.domain ?? "",
-      siteToken: data.siteToken ?? "",
-      verifiedAt: data.verifiedAt ? toDate(data.verifiedAt) : undefined,
-      projectId: data.projectId,
-      createdAt: toDate(data.createdAt),
-      updatedAt: toDate(data.updatedAt),
-    };
-  });
-}
-
-export async function createSite(
-  ownerId: string,
-  domain: string,
-  projectId?: string
-): Promise<{ site: FirestoreSite; token: string; error?: string }> {
-  if (!adminApp) return { site: {} as FirestoreSite, token: "", error: "Not configured" };
-  const normalized = domain.replace(/^https?:\/\//, "").replace(/\/$/, "").toLowerCase();
-  if (!normalized) return { site: {} as FirestoreSite, token: "", error: "Invalid domain" };
-
-  const token = crypto.randomUUID().replace(/-/g, "").slice(0, 32);
-  const now = new Date();
-  const ref = await db().collection("sites").add({
-    ownerId,
-    domain: normalized,
-    siteToken: token,
-    verifiedAt: null,
-    projectId: projectId ?? null,
-    createdAt: Timestamp.fromDate(now),
-    updatedAt: Timestamp.fromDate(now),
-  });
-
-  const site: FirestoreSite = {
-    id: ref.id,
-    ownerId,
-    domain: normalized,
-    siteToken: token,
-    projectId,
-    createdAt: now,
-    updatedAt: now,
-  };
-  return { site, token };
-}
-
-export async function verifySite(siteId: string, ownerId: string): Promise<boolean> {
-  if (!adminApp) return false;
-  const siteRef = db().collection("sites").doc(siteId);
-  const snap = await siteRef.get();
-  if (!snap.exists || snap.data()?.ownerId !== ownerId) return false;
-  const data = snap.data()!;
-  const domain = data.domain;
-  const token = data.siteToken;
-  if (!domain || !token) return false;
-
-  try {
-    const base = domain.startsWith("http") ? domain : `https://${domain}`;
-    const res = await fetch(base, { headers: { "User-Agent": "MerchantMagix-Verifier/1.0" } });
-    const html = await res.text();
-    const metaMatch =
-      html.match(
-        new RegExp(
-          `<meta[^>]+name=["']merchantmagix-site["'][^>]+content=["']${token}["']`,
-          "i"
-        )
-      ) ||
-      html.match(
-        new RegExp(
-          `<meta[^>]+content=["']${token}["'][^>]+name=["']merchantmagix-site["']`,
-          "i"
-        )
-      );
-    if (metaMatch) {
-      await siteRef.update({
-        verifiedAt: Timestamp.fromDate(new Date()),
-        updatedAt: Timestamp.fromDate(new Date()),
-      });
-      return true;
-    }
-  } catch {
-    // fetch failed
-  }
-  return false;
-}
-
-export async function createContact(
-  ownerId: string,
-  data: { name: string; email?: string; phone?: string; company?: string; notes?: string; stage?: string; projectId?: string }
-): Promise<FirestoreContact> {
-  if (!adminApp) throw new Error("Not configured");
-  const now = new Date();
-  const ref = await db().collection("contacts").add({
-    ownerId,
-    name: data.name,
-    email: data.email ?? null,
-    phone: data.phone ?? null,
-    company: data.company ?? null,
-    notes: data.notes ?? null,
-    stage: data.stage ?? "LEAD",
-    projectId: data.projectId ?? null,
-    createdAt: Timestamp.fromDate(now),
-    updatedAt: Timestamp.fromDate(now),
-  });
-  const doc = await ref.get();
-  const d = doc.data()!;
-  return {
-    id: ref.id,
-    ownerId: d.ownerId,
-    name: d.name ?? "",
-    email: d.email,
-    phone: d.phone,
-    company: d.company,
-    notes: d.notes,
-    stage: d.stage ?? "LEAD",
-    projectId: d.projectId,
-    createdAt: toDate(d.createdAt),
-    updatedAt: toDate(d.updatedAt),
-  };
-}
-
-export async function updateContact(
-  contactId: string,
-  ownerId: string,
-  data: { stage?: string; projectId?: string | null }
-): Promise<FirestoreContact | null> {
-  if (!adminApp) return null;
-  const snap = await db().collection("contacts").doc(contactId).get();
-  if (!snap.exists || snap.data()?.ownerId !== ownerId) return null;
-  const now = new Date();
-  const updates: Record<string, unknown> = { updatedAt: Timestamp.fromDate(now) };
-  if (data.stage !== undefined) updates.stage = data.stage;
-  if (data.projectId !== undefined) updates.projectId = data.projectId ?? null;
-  await db().collection("contacts").doc(contactId).update(updates);
-  const updated = await db().collection("contacts").doc(contactId).get();
-  const d = updated.data()!;
-  return {
-    id: contactId,
-    ownerId: d.ownerId,
-    name: d.name ?? "",
-    email: d.email,
-    phone: d.phone,
-    company: d.company,
-    notes: d.notes,
-    stage: d.stage ?? "LEAD",
-    projectId: d.projectId,
-    createdAt: toDate(d.createdAt),
-    updatedAt: toDate(d.updatedAt),
-  };
-}
-
-export async function deleteContact(contactId: string, ownerId: string): Promise<boolean> {
-  if (!adminApp) return false;
-  const snap = await db().collection("contacts").doc(contactId).get();
-  if (!snap.exists || snap.data()?.ownerId !== ownerId) return false;
-  await db().collection("contacts").doc(contactId).delete();
-  return true;
-}
-
 export async function getProjectsByOwner(ownerId: string): Promise<FirestoreProject[]> {
   if (!adminApp) return [];
   const snapshot = await db()
@@ -809,16 +589,16 @@ export async function verifyProjectSite(projectId: string, ownerId: string): Pro
 
   try {
     const base = websiteUrl.startsWith("http") ? websiteUrl : `https://${websiteUrl}`;
-    const res = await fetch(base, { headers: { "User-Agent": "MerchantMagix-Verifier/1.0" } });
+    const res = await fetch(base, { headers: { "User-Agent": "Webmint-Verifier/1.0" } });
     const html = await res.text();
     const metaMatch = html.match(
       new RegExp(
-        `<meta[^>]+name=["']merchantmagix-site["'][^>]+content=["']${token}["']`,
+        `<meta[^>]+name=["']webmint-site["'][^>]+content=["']${token}["']`,
         "i"
       )
     ) || html.match(
       new RegExp(
-        `<meta[^>]+content=["']${token}["'][^>]+name=["']merchantmagix-site["']`,
+        `<meta[^>]+content=["']${token}["'][^>]+name=["']webmint-site["']`,
         "i"
       )
     );
@@ -955,268 +735,120 @@ export async function getDashboardData(userId: string): Promise<{
   };
 }
 
-// --- Team / Organization ---
+// ─── Sites ────────────────────────────────────────────────────────────────────
 
-export interface Organization {
+export interface FirestoreSite {
   id: string;
-  name: string;
   ownerId: string;
+  domain: string;
+  siteToken: string;
+  verifiedAt?: Date;
+  projectId?: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface OrgMember {
-  id: string;
-  userId: string;
-  organizationId: string;
-  role: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER";
-  displayName?: string;
-  email?: string;
-  joinedAt: Date;
-}
-
-export interface OrgInvite {
-  id: string;
-  organizationId: string;
-  email: string;
-  role: "ADMIN" | "MEMBER" | "VIEWER";
-  invitedBy: string;
-  status: "PENDING" | "ACCEPTED" | "EXPIRED";
-  createdAt: Date;
-}
-
-export async function getTeamData(userId: string): Promise<{
-  organization: Organization | null;
-  members: OrgMember[];
-  invites: OrgInvite[];
-  currentUserRole: "OWNER" | "ADMIN" | "MEMBER" | "VIEWER" | null;
-}> {
-  if (!adminApp) return { organization: null, members: [], invites: [], currentUserRole: null };
-
-  const memberSnap = await db()
-    .collection("org_members")
-    .where("userId", "==", userId)
-    .limit(1)
-    .get();
-
-  if (memberSnap.empty) {
-    return { organization: null, members: [], invites: [], currentUserRole: null };
-  }
-
-  const memberData = memberSnap.docs[0].data();
-  const orgId = memberData.organizationId;
-  const orgSnap = await db().collection("organizations").doc(orgId).get();
-  if (!orgSnap.exists) return { organization: null, members: [], invites: [], currentUserRole: null };
-
-  const orgData = orgSnap.data()!;
-  const organization: Organization = {
-    id: orgSnap.id,
-    name: orgData.name ?? "My Organization",
-    ownerId: orgData.ownerId ?? "",
-    createdAt: toDate(orgData.createdAt),
-    updatedAt: toDate(orgData.updatedAt),
-  };
-
-  const membersSnap = await db()
-    .collection("org_members")
-    .where("organizationId", "==", orgId)
-    .get();
-
-  const members: OrgMember[] = [];
-  for (const d of membersSnap.docs) {
-    const m = d.data();
-    let displayName: string | undefined;
-    let email: string | undefined;
-    const userSnap = await db().collection("users").doc(m.userId).get();
-    if (userSnap.exists) {
-      displayName = userSnap.data()?.displayName;
-      email = userSnap.data()?.email;
-    }
-    members.push({
-      id: d.id,
-      userId: m.userId,
-      organizationId: m.organizationId,
-      role: m.role ?? "MEMBER",
-      displayName,
-      email,
-      joinedAt: toDate(m.joinedAt),
-    });
-  }
-
-  const invitesSnap = await db()
-    .collection("org_invites")
-    .where("organizationId", "==", orgId)
-    .where("status", "==", "PENDING")
+export async function getSitesByOwner(ownerId: string): Promise<FirestoreSite[]> {
+  if (!adminApp) return [];
+  const snapshot = await db()
+    .collection("sites")
+    .where("ownerId", "==", ownerId)
     .orderBy("createdAt", "desc")
     .get();
-
-  const invites: OrgInvite[] = invitesSnap.docs.map((d) => {
-    const i = d.data();
+  return snapshot.docs.map((d) => {
+    const data = d.data();
     return {
       id: d.id,
-      organizationId: i.organizationId,
-      email: i.email ?? "",
-      role: i.role ?? "MEMBER",
-      invitedBy: i.invitedBy ?? "",
-      status: i.status ?? "PENDING",
-      createdAt: toDate(i.createdAt),
+      ownerId: data.ownerId,
+      domain: data.domain ?? "",
+      siteToken: data.siteToken ?? "",
+      verifiedAt: data.verifiedAt ? toDate(data.verifiedAt) : undefined,
+      projectId: data.projectId,
+      createdAt: toDate(data.createdAt),
+      updatedAt: toDate(data.updatedAt),
     };
   });
-
-  const currentMember = members.find((m) => m.userId === userId);
-  const currentUserRole = currentMember?.role ?? null;
-
-  return { organization, members, invites, currentUserRole };
 }
 
-export async function createOrganization(userId: string, name: string): Promise<Organization | null> {
-  if (!adminApp) throw new Error("Firebase Admin not configured");
+export async function createSite(
+  ownerId: string,
+  domain: string,
+  projectId?: string
+): Promise<{ site: FirestoreSite; token: string; error?: string }> {
+  if (!adminApp) return { site: {} as FirestoreSite, token: "", error: "Not configured" };
+  const normalized = domain.replace(/^https?:\/\//, "").replace(/\/$/, "").toLowerCase();
+  if (!normalized) return { site: {} as FirestoreSite, token: "", error: "Invalid domain" };
+
+  const token = crypto.randomUUID().replace(/-/g, "").slice(0, 32);
   const now = new Date();
-  const ref = await db().collection("organizations").add({
-    name: name.trim() || "My Organization",
-    ownerId: userId,
+  const ref = await db().collection("sites").add({
+    ownerId,
+    domain: normalized,
+    siteToken: token,
+    verifiedAt: null,
+    projectId: projectId ?? null,
     createdAt: Timestamp.fromDate(now),
     updatedAt: Timestamp.fromDate(now),
   });
-  await db().collection("org_members").add({
-    userId,
-    organizationId: ref.id,
-    role: "OWNER",
-    joinedAt: Timestamp.fromDate(now),
-  });
-  const doc = await ref.get();
-  const data = doc.data()!;
-  return {
+
+  const site: FirestoreSite = {
     id: ref.id,
-    name: data.name ?? "My Organization",
-    ownerId: data.ownerId,
-    createdAt: toDate(data.createdAt),
-    updatedAt: toDate(data.updatedAt),
+    ownerId,
+    domain: normalized,
+    siteToken: token,
+    projectId,
+    createdAt: now,
+    updatedAt: now,
   };
+  return { site, token };
 }
 
-export async function inviteToOrganization(
-  orgId: string,
-  inviterId: string,
-  email: string,
-  role: "ADMIN" | "MEMBER" | "VIEWER"
-): Promise<{ ok: boolean; error?: string; inviteId?: string; token?: string }> {
-  if (!adminApp) return { ok: false, error: "Not configured" };
-  const orgSnap = await db().collection("organizations").doc(orgId).get();
-  if (!orgSnap.exists) return { ok: false, error: "Organization not found" };
-  const orgData = orgSnap.data()!;
-  const isOwner = orgData.ownerId === inviterId;
-  const memberSnap = await db()
-    .collection("org_members")
-    .where("organizationId", "==", orgId)
-    .where("userId", "==", inviterId)
-    .limit(1)
-    .get();
-  const inviterRole = memberSnap.docs[0]?.data()?.role;
-  const canInvite = isOwner || inviterRole === "ADMIN" || inviterRole === "OWNER";
-  if (!canInvite) return { ok: false, error: "Not authorized to invite" };
-  const existing = await db()
-    .collection("org_members")
-    .where("organizationId", "==", orgId)
-    .get();
-  for (const d of existing.docs) {
-    const u = await db().collection("users").doc(d.data().userId).get();
-    if (u.data()?.email?.toLowerCase() === email.toLowerCase()) {
-      return { ok: false, error: "User is already a member" };
+export async function verifySite(siteId: string, ownerId: string): Promise<boolean> {
+  if (!adminApp) return false;
+  const siteRef = db().collection("sites").doc(siteId);
+  const snap = await siteRef.get();
+  if (!snap.exists || snap.data()?.ownerId !== ownerId) return false;
+  const data = snap.data()!;
+  const domain = data.domain;
+  const token = data.siteToken;
+  if (!domain || !token) return false;
+
+  try {
+    const base = domain.startsWith("http") ? domain : `https://${domain}`;
+    const res = await fetch(base, { headers: { "User-Agent": "Webmint-Verifier/1.0" } });
+    const html = await res.text();
+    const metaMatch =
+      html.match(new RegExp(`<meta[^>]+name=["']webmint-site["'][^>]+content=["']${token}["']`, "i")) ||
+      html.match(new RegExp(`<meta[^>]+content=["']${token}["'][^>]+name=["']webmint-site["']`, "i"));
+    if (metaMatch) {
+      await siteRef.update({
+        verifiedAt: Timestamp.fromDate(new Date()),
+        updatedAt: Timestamp.fromDate(new Date()),
+      });
+      return true;
     }
+  } catch {
+    // fetch failed
   }
-  const existingInvite = await db()
-    .collection("org_invites")
-    .where("organizationId", "==", orgId)
-    .where("email", "==", email.toLowerCase())
-    .where("status", "==", "PENDING")
-    .limit(1)
-    .get();
-  if (!existingInvite.empty) return { ok: false, error: "Invite already sent" };
-
-  const token = crypto.randomUUID().replace(/-/g, "");
-  const ref = await db().collection("org_invites").add({
-    organizationId: orgId,
-    email: email.toLowerCase(),
-    role,
-    invitedBy: inviterId,
-    status: "PENDING",
-    token,
-    createdAt: Timestamp.fromDate(new Date()),
-  });
-  return { ok: true, inviteId: ref.id, token };
+  return false;
 }
 
-export async function getInviteByToken(token: string): Promise<{
-  invite: OrgInvite & { id: string; orgName?: string };
-} | null> {
-  if (!adminApp) return null;
-  const snap = await db()
-    .collection("org_invites")
-    .where("token", "==", token)
-    .where("status", "==", "PENDING")
-    .limit(1)
-    .get();
-  if (snap.empty) return null;
-  const d = snap.docs[0];
-  const data = d.data();
-  const orgSnap = await db().collection("organizations").doc(data.organizationId).get();
-  const orgName = orgSnap.exists ? (orgSnap.data()?.name ?? "Organization") : "Organization";
-  return {
-    invite: {
-      id: d.id,
-      organizationId: data.organizationId,
-      email: data.email ?? "",
-      role: data.role ?? "MEMBER",
-      invitedBy: data.invitedBy ?? "",
-      status: data.status ?? "PENDING",
-      createdAt: toDate(data.createdAt),
-      orgName,
-    },
-  };
+export async function deleteSite(siteId: string, ownerId: string): Promise<boolean> {
+  if (!adminApp) return false;
+  const snap = await db().collection("sites").doc(siteId).get();
+  if (!snap.exists || snap.data()?.ownerId !== ownerId) return false;
+  await db().collection("sites").doc(siteId).delete();
+  return true;
 }
 
-export async function acceptInvite(
-  token: string,
-  userId: string,
-  userEmail: string
-): Promise<{ ok: boolean; error?: string }> {
-  if (!adminApp) return { ok: false, error: "Not configured" };
-  const result = await getInviteByToken(token);
-  if (!result) return { ok: false, error: "Invalid or expired invite" };
-  const { invite } = result;
-  if (userEmail.toLowerCase() !== invite.email) {
-    return { ok: false, error: "This invite was sent to a different email address" };
-  }
-  const existing = await db()
-    .collection("org_members")
-    .where("organizationId", "==", invite.organizationId)
-    .where("userId", "==", userId)
-    .limit(1)
-    .get();
-  if (!existing.empty) return { ok: false, error: "You are already a member" };
-
-  const now = new Date();
-  await db().collection("org_members").add({
-    userId,
-    organizationId: invite.organizationId,
-    role: invite.role,
-    joinedAt: Timestamp.fromDate(now),
-  });
-  await db().collection("org_invites").doc(invite.id).update({
-    status: "ACCEPTED",
-    acceptedAt: Timestamp.fromDate(now),
-    acceptedBy: userId,
-  });
-  return { ok: true };
-}
-
-// --- Intakes ---
+// ─── Intakes ──────────────────────────────────────────────────────────────────
 
 export interface FirestoreIntake {
   id: string;
-  status: "SUBMITTED" | "REVIEWED" | "PROJECT_CREATED";
-  projectType: string;
+  ownerId: string | null;
+  contactName: string;
+  contactEmail: string;
+  projectType?: string;
   businessName?: string;
   industry?: string;
   goals?: string;
@@ -1224,17 +856,18 @@ export interface FirestoreIntake {
   features?: string;
   budget?: string;
   timeline?: string;
-  contactName: string;
-  contactEmail: string;
   contactPhone?: string;
-  ownerId?: string | null;
-  projectId?: string | null;
+  status: "SUBMITTED" | "PROJECT_CREATED" | "REVIEWED";
+  projectId?: string;
+  isRead: boolean;
   createdAt: Date;
-  updatedAt: Date;
 }
 
-export interface CreateIntakeInput {
-  projectType: string;
+export async function createIntake(data: {
+  ownerId: string | null;
+  contactName: string;
+  contactEmail: string;
+  projectType?: string;
   businessName?: string;
   industry?: string;
   goals?: string;
@@ -1242,18 +875,15 @@ export interface CreateIntakeInput {
   features?: string;
   budget?: string;
   timeline?: string;
-  contactName: string;
-  contactEmail: string;
   contactPhone?: string;
-  ownerId?: string | null;
-}
-
-export async function createIntake(data: CreateIntakeInput): Promise<FirestoreIntake> {
+}): Promise<FirestoreIntake> {
   if (!adminApp) throw new Error("Not configured");
   const now = new Date();
   const ref = await db().collection("intakes").add({
-    status: "SUBMITTED",
-    projectType: data.projectType ?? "",
+    ownerId: data.ownerId ?? null,
+    contactName: data.contactName,
+    contactEmail: data.contactEmail,
+    projectType: data.projectType ?? null,
     businessName: data.businessName ?? null,
     industry: data.industry ?? null,
     goals: data.goals ?? null,
@@ -1261,65 +891,24 @@ export async function createIntake(data: CreateIntakeInput): Promise<FirestoreIn
     features: data.features ?? null,
     budget: data.budget ?? null,
     timeline: data.timeline ?? null,
-    contactName: data.contactName ?? "",
-    contactEmail: data.contactEmail ?? "",
     contactPhone: data.contactPhone ?? null,
-    ownerId: data.ownerId ?? null,
-    projectId: null,
+    status: "SUBMITTED",
+    isRead: false,
     createdAt: Timestamp.fromDate(now),
-    updatedAt: Timestamp.fromDate(now),
   });
-  const doc = await ref.get();
-  const d = doc.data()!;
   return {
     id: ref.id,
-    status: d.status ?? "SUBMITTED",
-    projectType: d.projectType ?? "",
-    businessName: d.businessName,
-    industry: d.industry,
-    goals: d.goals,
-    scope: d.scope,
-    features: d.features,
-    budget: d.budget,
-    timeline: d.timeline,
-    contactName: d.contactName ?? "",
-    contactEmail: d.contactEmail ?? "",
-    contactPhone: d.contactPhone,
-    ownerId: d.ownerId,
-    projectId: d.projectId,
-    createdAt: toDate(d.createdAt),
-    updatedAt: toDate(d.updatedAt),
+    ownerId: data.ownerId,
+    contactName: data.contactName,
+    contactEmail: data.contactEmail,
+    projectType: data.projectType,
+    businessName: data.businessName,
+    goals: data.goals,
+    budget: data.budget,
+    status: "SUBMITTED",
+    isRead: false,
+    createdAt: now,
   };
-}
-
-export async function getIntakesForAdmin(): Promise<FirestoreIntake[]> {
-  if (!adminApp) return [];
-  const snapshot = await db()
-    .collection("intakes")
-    .orderBy("createdAt", "desc")
-    .get();
-  return snapshot.docs.map((d) => {
-    const data = d.data();
-    return {
-      id: d.id,
-      status: data.status ?? "SUBMITTED",
-      projectType: data.projectType ?? "",
-      businessName: data.businessName,
-      industry: data.industry,
-      goals: data.goals,
-      scope: data.scope,
-      features: data.features,
-      budget: data.budget,
-      timeline: data.timeline,
-      contactName: data.contactName ?? "",
-      contactEmail: data.contactEmail ?? "",
-      contactPhone: data.contactPhone,
-      ownerId: data.ownerId,
-      projectId: data.projectId,
-      createdAt: toDate(data.createdAt),
-      updatedAt: toDate(data.updatedAt),
-    };
-  });
 }
 
 export async function getIntakesByUser(ownerId: string): Promise<FirestoreIntake[]> {
@@ -1333,8 +922,10 @@ export async function getIntakesByUser(ownerId: string): Promise<FirestoreIntake
     const data = d.data();
     return {
       id: d.id,
-      status: data.status ?? "SUBMITTED",
-      projectType: data.projectType ?? "",
+      ownerId: data.ownerId ?? null,
+      contactName: data.contactName ?? data.name ?? "",
+      contactEmail: data.contactEmail ?? data.email ?? "",
+      projectType: data.projectType,
       businessName: data.businessName,
       industry: data.industry,
       goals: data.goals,
@@ -1342,80 +933,67 @@ export async function getIntakesByUser(ownerId: string): Promise<FirestoreIntake
       features: data.features,
       budget: data.budget,
       timeline: data.timeline,
-      contactName: data.contactName ?? "",
-      contactEmail: data.contactEmail ?? "",
       contactPhone: data.contactPhone,
-      ownerId: data.ownerId,
+      status: data.status ?? "SUBMITTED",
       projectId: data.projectId,
+      isRead: data.isRead ?? false,
       createdAt: toDate(data.createdAt),
-      updatedAt: toDate(data.updatedAt),
     };
   });
 }
 
-export async function createProject(
-  ownerId: string,
-  data: { name: string; description?: string; type: string }
-): Promise<FirestoreProject> {
-  if (!adminApp) throw new Error("Not configured");
-  const now = new Date();
-  const ref = await db().collection("projects").add({
-    ownerId,
-    name: data.name,
-    description: data.description ?? null,
-    type: data.type ?? "SHOPIFY",
-    status: "DISCOVERY",
-    startDate: null,
-    targetLaunchDate: null,
-    websiteUrl: null,
-    createdAt: Timestamp.fromDate(now),
-    updatedAt: Timestamp.fromDate(now),
+export async function getIntakesForAdmin(): Promise<FirestoreIntake[]> {
+  if (!adminApp) return [];
+  const snapshot = await db()
+    .collection("intakes")
+    .orderBy("createdAt", "desc")
+    .limit(100)
+    .get();
+  return snapshot.docs.map((d) => {
+    const data = d.data();
+    return {
+      id: d.id,
+      ownerId: data.ownerId ?? null,
+      contactName: data.contactName ?? data.name ?? "",
+      contactEmail: data.contactEmail ?? data.email ?? "",
+      projectType: data.projectType,
+      businessName: data.businessName,
+      industry: data.industry,
+      goals: data.goals,
+      scope: data.scope,
+      features: data.features,
+      budget: data.budget,
+      timeline: data.timeline,
+      contactPhone: data.contactPhone,
+      status: data.status ?? "SUBMITTED",
+      projectId: data.projectId,
+      isRead: data.isRead ?? false,
+      createdAt: toDate(data.createdAt),
+    };
   });
-  const doc = await ref.get();
-  const d = doc.data()!;
-  return {
-    id: ref.id,
-    ownerId: d.ownerId,
-    name: d.name ?? "",
-    description: d.description,
-    type: d.type ?? "SHOPIFY",
-    status: d.status ?? "DISCOVERY",
-    startDate: undefined,
-    targetLaunchDate: undefined,
-    websiteUrl: d.websiteUrl,
-    createdAt: toDate(d.createdAt),
-    updatedAt: toDate(d.updatedAt),
-  };
 }
 
 export async function createProjectFromIntake(
   intakeId: string,
-  developerId: string
-): Promise<{ project: FirestoreProject; error?: string }> {
-  if (!adminApp) return { project: null as unknown as FirestoreProject, error: "Not configured" };
-  const intakeSnap = await db().collection("intakes").doc(intakeId).get();
-  if (!intakeSnap.exists) return { project: null as unknown as FirestoreProject, error: "Intake not found" };
-  const intake = intakeSnap.data()!;
-  if (intake.status === "PROJECT_CREATED") {
-    return { project: null as unknown as FirestoreProject, error: "Project already created from this intake" };
+  ownerId: string,
+  projectData: { name: string; type: string; description?: string }
+): Promise<{ ok: boolean; projectId?: string; error?: string }> {
+  if (!adminApp) return { ok: false, error: "Not configured" };
+  const now = new Date();
+  try {
+    const ref = await db().collection("projects").add({
+      ownerId,
+      name: projectData.name,
+      type: projectData.type,
+      description: projectData.description ?? null,
+      status: "DISCOVERY",
+      intakeId,
+      createdAt: Timestamp.fromDate(now),
+      updatedAt: Timestamp.fromDate(now),
+    });
+    await db().collection("intakes").doc(intakeId).update({ isRead: true, projectId: ref.id });
+    return { ok: true, projectId: ref.id };
+  } catch (e) {
+    return { ok: false, error: String(e) };
   }
-
-  const ownerId = intake.ownerId ?? developerId;
-  const projectName = intake.businessName
-    ? `${intake.businessName} - ${intake.projectType}`
-    : `${intake.contactName} - ${intake.projectType}`;
-
-  const project = await createProject(ownerId, {
-    name: projectName.trim(),
-    description: [intake.goals, intake.scope, intake.features].filter(Boolean).join("\n\n") || undefined,
-    type: intake.projectType?.toUpperCase().includes("CUSTOM") ? "CUSTOM" : "SHOPIFY",
-  });
-
-  await db().collection("intakes").doc(intakeId).update({
-    status: "PROJECT_CREATED",
-    projectId: project.id,
-    updatedAt: Timestamp.fromDate(new Date()),
-  });
-
-  return { project };
 }

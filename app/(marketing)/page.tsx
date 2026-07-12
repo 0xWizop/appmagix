@@ -108,7 +108,7 @@ const productOptions = [
   {
     icon: ShoppingBag,
     title: "Shopify Build",
-    price: "$500",
+    price: "$300",
     priceLabel: "starting at",
     description: "Fast, reliable, and perfect for most businesses. We customize premium themes to match your brand perfectly.",
     features: [
@@ -121,7 +121,7 @@ const productOptions = [
   {
     icon: Code2,
     title: "Custom Shopify Build",
-    price: "$1,500",
+    price: "$1,000",
     priceLabel: "starting at",
     description: "Heavily customized Shopify stores—custom themes, checkout extensions, and unique functionality built for your needs.",
     features: [
@@ -160,7 +160,7 @@ const productOptions = [
 ];
 
 const comparisonFeatures = [
-  { feature: "Starting Price", shopify: "$500", customShopify: "$1,500", customWebsite: "Custom", appBuild: "Custom" },
+  { feature: "Starting Price", shopify: "$300", customShopify: "$1,000", customWebsite: "Custom", appBuild: "Custom" },
   { feature: "Timeline", shopify: "1–2 weeks", customShopify: "2–4 weeks", customWebsite: "4–8 weeks", appBuild: "Varies" },
   { feature: "Theme Customization", shopify: "Premium themes", customShopify: "Custom themes", customWebsite: "100% custom", appBuild: "—" },
   { feature: "Checkout Extensions", shopify: "—", customShopify: "✓", customWebsite: "—", appBuild: "—" },
@@ -176,11 +176,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "App & Website Builder | Custom Apps, Sites & Ecommerce",
     description:
-      "MerchantMagix builds custom web apps, websites, and ecommerce experiences. From Shopify stores to SaaS products—we build what you need. Ecommerce-focused, platform-agnostic.",
+      "Webmint builds custom web apps, websites, and ecommerce experiences. From Shopify stores to SaaS products — we build what you need.",
     openGraph: {
-      title: "App & Website Builder | MerchantMagix",
+      title: "App & Website Builder | Webmint",
       description:
-        "Custom web apps, websites, and ecommerce. Shopify builds from $799, custom from $2,499. Plus Shopify mini apps to power your store.",
+        "Custom web apps, websites, and ecommerce. Shopify builds from $500, custom websites and apps — contact us for a quote.",
       url: "/",
     },
   };
@@ -212,7 +212,7 @@ export default function HomePage() {
                 <HoverCard className={`h-full flex flex-col ${i === 0 ? "border-brand-green/30" : ""}`}>
                   {i === 0 && (
                     <div className="absolute top-4 right-4">
-                      <Badge>From $500</Badge>
+                      <Badge>From $300</Badge>
                     </div>
                   )}
                   <CardContent className="p-6 flex flex-col flex-1 min-h-0">
@@ -283,19 +283,19 @@ export default function HomePage() {
 
       {/* SaaS Dashboard Preview Section */}
       <section className="section-padding bg-background relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.05),transparent)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(52,211,153,0.05),transparent)] pointer-events-none" />
         <div className="container-width relative">
           <MotionAnimateIn animation="fadeUp">
             <div className="text-center mb-12">
               <Badge variant="secondary" className="mb-4 bg-brand-green/10 text-brand-green border border-brand-green/20">
-                Exclusive SaaS Tools
+                Client Dashboard
               </Badge>
               <h2 className="text-3xl sm:text-4xl font-medium mb-4">
-                Manage your growth from one dashboard
+                Your project hub, always in view
               </h2>
               <p className="text-text-secondary max-w-2xl mx-auto mb-10">
-                Every project comes with access to our proprietary dashboard. Track your sites, 
-                manage support, view invoices, and use powerful ecommerce tools—all in one place.
+                Every client gets a dedicated dashboard. Track your build progress, submit change 
+                requests, view analytics, and pay invoices — all in one place.
               </p>
             </div>
           </MotionAnimateIn>
@@ -306,33 +306,33 @@ export default function HomePage() {
           
           <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-2xl font-bold text-brand-green">24/7</div>
-              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Support Access</div>
+              <div className="text-2xl font-bold text-brand-green">Live</div>
+              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Progress Tracking</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-brand-green">Real-time</div>
-              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Analytics</div>
-            </div>
-            <div>
-              <div className="text-2xl font-bold text-brand-green">Secure</div>
-              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Asset Vault</div>
+              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Site Analytics</div>
             </div>
             <div>
               <div className="text-2xl font-bold text-brand-green">Easy</div>
-              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Billing</div>
+              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Change Requests</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-brand-green">Secure</div>
+              <div className="text-xs text-text-muted uppercase tracking-wider mt-1">Billing & Invoices</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section — Why choose merchantmagix */}
+              {/* Features Section — Why choose Webmint */}
       <section className="section-padding relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_20%_50%,rgba(34,197,94,0.04),transparent)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_20%_50%,rgba(52,211,153,0.04),transparent)] pointer-events-none" />
         <div className="container-width relative">
           <MotionAnimateIn animation="fadeUp" rootMargin="0px 0px -60px 0px">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-medium mb-4">
-                Why choose merchantmagix?
+                Why choose Webmint?
               </h2>
               <p className="text-text-secondary max-w-2xl mx-auto">
                 We build apps and websites of all kinds—with deep expertise in
@@ -410,11 +410,11 @@ export default function HomePage() {
             <CardContent className="p-8 md:p-12 text-center">
               <div className="max-w-2xl mx-auto">
                 <h2 className="text-3xl sm:text-4xl font-medium mb-4">
-                  Ready to build your dream store?
+                  Ready to build your next project?
                 </h2>
                 <p className="text-text-secondary mb-8">
-                  Let&apos;s talk about your project. Free consultation, no
-                  pressure, just honest advice on the best path forward.
+                  Tell us about your project and we&apos;ll get back to you within 24 hours.
+                  No calls required — just fill out the form.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <AnimatedCta href="/#intake" variant="primary" size="lg">

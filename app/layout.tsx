@@ -6,48 +6,49 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 const cormorant = Cormorant_Garamond({ weight: ["400", "600"], subsets: ["latin"], display: "swap", variable: "--font-brand" });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://merchantmagix.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://webmint.io";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "MerchantMagix - Ecommerce Website Development Agency",
-    template: "%s | MerchantMagix",
+    default: "Webmint - Website & App Building Platform",
+    template: "%s | Webmint",
   },
   description:
-    "We build stunning Shopify stores and custom ecommerce websites that convert. Expert web development for growing businesses. Shopify from $799, custom builds from $2,499.",
+    "We build stunning websites and custom web apps that convert. Expert web development for growing businesses. Shopify from $799, custom builds from $2,499.",
   keywords: [
-    "ecommerce development",
+    "website builder",
+    "web development",
+    "app builder",
     "shopify store",
     "shopify developer",
-    "custom ecommerce",
+    "custom website",
     "online store development",
-    "ecommerce agency",
-    "web development",
+    "web agency",
   ],
-  authors: [{ name: "MerchantMagix", url: siteUrl }],
-  creator: "MerchantMagix",
+  authors: [{ name: "Webmint", url: siteUrl }],
+  creator: "Webmint",
   openGraph: {
     type: "website",
     locale: "en_US",
     url: siteUrl,
-    siteName: "MerchantMagix",
-    title: "MerchantMagix - Ecommerce Website Development Agency",
+    siteName: "Webmint",
+    title: "Webmint - Website & App Building Platform",
     description:
-      "We build stunning Shopify stores and custom ecommerce websites that convert. Expert web development for growing businesses.",
+      "We build stunning websites and custom web apps that convert. Expert web development for growing businesses.",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "MerchantMagix - Ecommerce Website Development",
+        alt: "Webmint - Website & App Building Platform",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "MerchantMagix - Ecommerce Website Development Agency",
-    description: "We build stunning Shopify stores and custom ecommerce websites that convert.",
+    title: "Webmint - Website & App Building Platform",
+    description: "We build stunning websites and custom web apps that convert.",
   },
   robots: {
     index: true,
@@ -70,8 +71,8 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "MerchantMagix",
-    description: "Ecommerce website development agency. We build Shopify stores and custom ecommerce websites.",
+    name: "Webmint",
+    description: "Website and app building platform. We build websites, web apps, and Shopify stores.",
     url: siteUrl,
     logo: `${siteUrl}/logo.png`,
     sameAs: [],

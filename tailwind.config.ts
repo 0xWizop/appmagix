@@ -10,11 +10,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Brand: professional green + tech accent
+        // Brand: emerald mint
         brand: {
-          green: "#22c55e",
-          "green-dark": "#16a34a",
-          "green-light": "#4ade80",
+          green: "#34D399",
+          "green-dark": "#10B981",
+          "green-light": "#6EE7B7",
         },
         // Use CSS variables for theme-aware colors
         background: "rgb(var(--background))",

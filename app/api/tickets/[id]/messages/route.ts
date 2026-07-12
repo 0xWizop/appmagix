@@ -33,9 +33,10 @@ export async function POST(req: NextRequest, { params }: RouteParams) {
     const body = await req.json();
     const { content } = createMessageSchema.parse(body);
 
-    // Load ticket with owner info for email notification
+    // Admin can reply to any ticket; clients can only reply to their own
+    const isAdmin = user.role === "ADMIN" || session.user.email === "merchantmagix@gmail.com";
     const ticket = await db.ticket.findFirst({
-      where: { id: ticketId, userId: user.id },
+      where: isAdmin ? { id: ticketId } : { id: ticketId, userId: user.id },
       include: { user: { select: { id: true, name: true, email: true } } },
     });
     if (!ticket) {

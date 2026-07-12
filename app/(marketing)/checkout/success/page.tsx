@@ -30,7 +30,7 @@ export default function CheckoutSuccessPage() {
 
         {/* Wordmark */}
         <p className="text-sm font-semibold tracking-widest text-text-muted uppercase mb-6">
-          merchant<span className="text-brand-green">magix</span>
+          web<span className="text-brand-green">mint</span>
         </p>
 
         <h1 className="text-3xl sm:text-4xl font-semibold mb-4 text-white">

@@ -17,9 +17,9 @@ interface BrandThemeContextType {
 const BrandThemeContext = createContext<BrandThemeContextType | undefined>(undefined);
 
 const defaultColors: BrandColors = {
-  primary: "#22c55e",
-  secondary: "#166534",
-  accent: "#22c55e",
+  primary: "#34D399",
+  secondary: "#10B981",
+  accent: "#34D399",
 };
 
 export function BrandThemeProvider({ children }: { children: React.ReactNode }) {

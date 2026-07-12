@@ -23,7 +23,7 @@ const PROJECT_TYPES: ProjectType[] = [
     label: "Custom Website",
     icon: Globe,
     description: "Marketing site, portfolio, or content-heavy platform built with React/Next.js",
-    basePrice: 1500,
+    basePrice: 1000,
     baseLabel: "Design + development",
   },
   {
@@ -39,7 +39,7 @@ const PROJECT_TYPES: ProjectType[] = [
     label: "E-Commerce Store",
     icon: ShoppingBag,
     description: "Custom storefront on Shopify, Next.js Commerce, WooCommerce, or headless",
-    basePrice: 500,
+    basePrice: 300,
     baseLabel: "Store setup",
   },
   {

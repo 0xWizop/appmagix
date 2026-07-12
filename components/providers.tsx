@@ -3,7 +3,6 @@
 import { FirebaseAuthProvider } from "@/lib/firebase-auth-context";
 import { ToastProviderWrapper } from "@/lib/toast-context";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Web3Provider } from "@/components/web3-provider";
 import { BrandThemeProvider } from "@/components/dashboard/brand-theme-provider";
 
 interface ProvidersProps {
@@ -15,9 +14,7 @@ export function Providers({ children }: ProvidersProps) {
     <ThemeProvider>
       <FirebaseAuthProvider>
         <BrandThemeProvider>
-          <Web3Provider>
-            <ToastProviderWrapper>{children}</ToastProviderWrapper>
-          </Web3Provider>
+          <ToastProviderWrapper>{children}</ToastProviderWrapper>
         </BrandThemeProvider>
       </FirebaseAuthProvider>
     </ThemeProvider>

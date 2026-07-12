@@ -1,20 +1,20 @@
 import { Resend } from "resend";
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const EMAIL_FROM = process.env.EMAIL_FROM || "MerchantMagix <merchantmagix@gmail.com>";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://merchantmagix.com";
+const EMAIL_FROM = process.env.EMAIL_FROM || "Webmint <hello@webmint.io>";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://webmint.io";
 
 function baseLayout(content: string) {
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; background: #0a0a0a; color: #e5e7eb; padding: 32px 24px; border-radius: 12px;">
       <div style="margin-bottom: 24px;">
-        <span style="font-size: 20px; font-weight: 600; color: #ffffff;">merchant<span style="color: #00D166;">magix</span>.</span>
+        <span style="font-size: 20px; font-weight: 600; color: #ffffff;">web<span style="color: #4DB896;">mint</span>.</span>
       </div>
       ${content}
       <hr style="border: none; border-top: 1px solid #1f2937; margin: 24px 0;" />
       <p style="color: #6b7280; font-size: 12px; margin: 0;">
-        You received this from <a href="${APP_URL}" style="color: #00D166;">MerchantMagix</a>. 
-        Questions? Reply to this email or visit your <a href="${APP_URL}/dashboard" style="color: #00D166;">dashboard</a>.
+        You received this from <a href="${APP_URL}" style="color: #4DB896;">Webmint</a>. 
+        Questions? Reply to this email or visit your <a href="${APP_URL}/dashboard" style="color: #4DB896;">dashboard</a>.
       </p>
     </div>
   `;
@@ -65,71 +65,6 @@ export async function sendInvoiceReminder({
     return { ok: true };
   } catch (err) {
     console.error("[sendInvoiceReminder]", err);
-    return { ok: false, error: String(err) };
-  }
-}
-
-// ─── Booking Confirmation ─────────────────────────────────────────────────────
-export async function sendBookingConfirmation({
-  to,
-  clientName,
-  bookingTitle,
-  startTime,
-  endTime,
-  projectName,
-  description,
-}: {
-  to: string;
-  clientName: string;
-  bookingTitle: string;
-  startTime: Date;
-  endTime: Date;
-  projectName?: string;
-  description?: string;
-}) {
-  if (!resend) return { ok: false, error: "Resend not configured" };
-
-  const fmt = (d: Date) =>
-    d.toLocaleString("en-US", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "numeric",
-      minute: "2-digit",
-      timeZoneName: "short",
-    });
-
-  const projectLine = projectName
-    ? `<p style="margin: 0 0 4px 0; color: #9ca3af;">Project: <span style="color: #e5e7eb;">${projectName}</span></p>`
-    : "";
-  const descLine = description
-    ? `<p style="margin: 8px 0 0 0; color: #9ca3af; font-size: 13px;">${description}</p>`
-    : "";
-
-  const content = `
-    <h2 style="color: #ffffff; margin: 0 0 8px 0;">Booking Confirmed ✓</h2>
-    <p style="color: #9ca3af; margin: 0 0 24px 0;">Hi ${clientName}, your booking has been confirmed. Here are the details:</p>
-    <div style="background: #111827; border: 1px solid #1f2937; border-left: 3px solid #00D166; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-      <p style="margin: 0 0 8px 0; font-size: 18px; font-weight: 600; color: #ffffff;">${bookingTitle}</p>
-      <p style="margin: 0 0 4px 0; color: #9ca3af;">Start: <span style="color: #e5e7eb;">${fmt(startTime)}</span></p>
-      <p style="margin: 0 0 4px 0; color: #9ca3af;">End: <span style="color: #e5e7eb;">${fmt(endTime)}</span></p>
-      ${projectLine}
-      ${descLine}
-    </div>
-    <a href="${APP_URL}/dashboard/web2/booking" style="display: inline-block; background: #00D166; color: #000; font-weight: 600; padding: 12px 24px; border-radius: 8px; text-decoration: none;">View in Dashboard →</a>
-  `;
-
-  try {
-    await resend.emails.send({
-      from: EMAIL_FROM,
-      to,
-      subject: `Booking confirmed: ${bookingTitle}`,
-      html: baseLayout(content),
-    });
-    return { ok: true };
-  } catch (err) {
-    console.error("[sendBookingConfirmation]", err);
     return { ok: false, error: String(err) };
   }
 }
@@ -235,7 +170,7 @@ export async function sendTicketReplyNotification({
   if (!resend) return { ok: false, error: "Resend not configured" };
 
   const preview = replyContent.length > 200 ? replyContent.slice(0, 200) + "…" : replyContent;
-  const from = replierName ? replierName : "The MerchantMagix Team";
+  const from = replierName ? replierName : "The Webmint Team";
 
   const content = `
     <h2 style="color: #ffffff; margin: 0 0 8px 0;">New Reply on Your Ticket</h2>

@@ -24,11 +24,11 @@ export async function POST(
   }
 
   try {
-    const result = await createProjectFromIntake(id, session.user.id);
+    const result = await createProjectFromIntake(id, session.user.id, { name: "New Project", type: "CUSTOM" });
     if (result.error) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
-    return NextResponse.json({ project: result.project });
+    return NextResponse.json({ project: { id: result.projectId } });
   } catch (error) {
     console.error("Create project from intake error:", error);
     return NextResponse.json(

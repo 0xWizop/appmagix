@@ -11,7 +11,7 @@ const navigation = [
   { name: "Services", href: "/services" },
   { name: "Pricing", href: "/pricing" },
   { name: "Work", href: "/work" },
-  { name: "Docs", href: "/docs" },
+  { name: "Help", href: "/help" },
   { name: "Contact", href: "/contact" },
 ];
 
@@ -36,7 +36,7 @@ export function Header() {
       <nav className="container-width section-padding !py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center group">
           <span className="text-2xl font-brand italic tracking-tight text-text-primary transition-colors group-hover:opacity-90">
-            merchant<span className="text-brand-green">magix</span>.
+            web<span className="text-brand-green">mint</span>.
           </span>
         </Link>
 
@@ -53,15 +53,16 @@ export function Header() {
         </div>
 
         <div className="hidden md:flex items-center gap-4">
-          <Button asChild>
-            <Link href="/dashboard">Dashboard</Link>
-          </Button>
-          {!user && (
+          {user ? (
+            <Button asChild>
+              <Link href="/dashboard">Go to Dashboard</Link>
+            </Button>
+          ) : (
             <>
               <Button variant="ghost" asChild>
                 <Link href="/login">Sign In</Link>
               </Button>
-              <Button variant="outline" asChild>
+              <Button asChild>
                 <Link href="/contact">Get Started</Link>
               </Button>
             </>

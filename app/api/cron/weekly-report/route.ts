@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getProjectsByOwner, getSitesByOwner, getAnalyticsForProject, getAnalyticsForSite } from "@/lib/firestore";
-import { getTrafficAlerts } from "@/lib/traffic-alert";
 import { Resend } from "resend";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
-const EMAIL_FROM = process.env.EMAIL_FROM || "MerchantMagix <noreply@merchantmagix.com>";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://merchantmagix.com";
+const EMAIL_FROM = process.env.EMAIL_FROM || "Webmint <noreply@webmint.io>";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://webmint.io";
 
 export async function GET(req: NextRequest) {
   const auth = req.headers.get("authorization") || req.nextUrl.searchParams.get("secret");
@@ -23,17 +22,14 @@ export async function GET(req: NextRequest) {
   }
 
   const DAYS = 7;
-  const subs = await db.subscription.findMany({
-    where: {
-      status: { in: ["active", "trialing"] },
-      currentPeriodEnd: { gte: new Date() },
-    },
-    include: { user: true },
+  // Send to all users who have a Firebase UID (connected sites users)
+  const users = await db.user.findMany({
+    where: { firebaseUid: { not: null } },
+    select: { id: true, email: true, name: true, firebaseUid: true },
   });
 
   let sent = 0;
-  for (const sub of subs) {
-    const user = sub.user;
+  for (const user of users) {
     if (!user.email || user.email.endsWith("@placeholder.local") || !user.firebaseUid) continue;
 
     const ownerId = user.firebaseUid;
@@ -65,26 +61,12 @@ export async function GET(req: NextRequest) {
     }
 
     const totalViews = summaries.reduce((s, x) => s + x.pageViews, 0);
-    const trafficAlerts = await getTrafficAlerts(ownerId).catch(() => []);
-    const trafficAlertBlock =
-      trafficAlerts.length > 0
-        ? `
-        <div style="margin: 1rem 0; padding: 1rem; border: 1px solid #d97706; border-radius: 8px; background: #fffbeb;">
-          <strong style="color: #b45309;">Traffic alert</strong>
-          <p style="margin: 0.5rem 0 0 0; font-size: 14px;">Traffic is down compared to the previous week on:</p>
-          <ul style="margin: 0.5rem 0 0 1rem; padding: 0;">
-            ${trafficAlerts.map((a) => `<li>${a.sourceName}: ${a.currentViews} views (was ${a.previousViews}) — down ${Math.abs(Math.round(a.percentChange))}%</li>`).join("")}
-          </ul>
-          <p style="margin: 0.5rem 0 0 0;"><a href="${APP_URL}/dashboard/web2/analytics" style="color: #0f766e;">View Sites & Analytics →</a></p>
-        </div>
-        `
-        : "";
 
     const html = `
       <div style="font-family: sans-serif; max-width: 560px; margin: 0 auto;">
         <h2 style="color: #0f766e;">Your weekly analytics</h2>
         <p>Hi${user.name ? ` ${user.name.split(" ")[0]}` : ""}, here’s your Sites & Analytics summary for the last ${DAYS} days.</p>
-        ${trafficAlertBlock}
+        
         <p><strong>Total page views:</strong> ${totalViews.toLocaleString()}</p>
         ${summaries.map((s) => `
           <div style="margin: 1rem 0; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 8px;">
@@ -94,7 +76,7 @@ export async function GET(req: NextRequest) {
           </div>
         `).join("")}
         <p><a href="${APP_URL}/dashboard/web2/analytics" style="color: #0f766e;">View full analytics →</a></p>
-        <p style="color: #6b7280; font-size: 12px;">You’re receiving this because you’re subscribed to MerchantMagix SaaS.</p>
+        <p style="color: #6b7280; font-size: 12px;">You’re receiving this because you’re subscribed to Webmint.</p>
       </div>
     `;
 
@@ -111,5 +93,7 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({ ok: true, sent, total: subs.length });
+  return NextResponse.json({ ok: true, sent, total: users.length });
 }
+
+

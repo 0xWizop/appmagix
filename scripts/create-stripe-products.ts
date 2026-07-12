@@ -1,5 +1,5 @@
 /**
- * Creates Stripe Products and Prices for MerchantMagix fixed-price offerings.
+ * Creates Stripe Products and Prices for Webmint fixed-price offerings.
  * Run once: npm run stripe:create-products
  * Requires: .env with STRIPE_SECRET_KEY set.
  * Output: stripe-products.json with price IDs for use in the app.

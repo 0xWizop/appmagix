@@ -1,13 +1,11 @@
 import { getSession } from "@/lib/firebase-session";
 import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
-import { hasActiveSubscription } from "@/lib/subscription";
 import { getProjectsByOwner, getSitesByOwner, getAnalyticsForProject, getAnalyticsForSite } from "@/lib/firestore";
 import { Card, CardContent } from "@/components/ui/card";
 import { AnalyticsCharts } from "./analytics-charts";
 import { SourceSelector } from "./source-selector";
 import { AnalyticsToolbar } from "./analytics-toolbar";
 import { AddSiteForm } from "@/components/dashboard/add-site-form";
-import { SubscriptionGate } from "@/components/dashboard/subscription-gate";
 import { BarChart3, Eye, FileText } from "lucide-react";
 import { PageTips } from "@/components/dashboard/page-tips";
 
@@ -18,23 +16,16 @@ interface AnalyticsPageProps {
 export default async function AnalyticsPage({ searchParams }: AnalyticsPageProps) {
   const session = await getSession();
   const userId = session?.user?.id;
-  let prismaUser: { id: string } | null = null;
-  let canAccess = false;
   if (userId) {
     try {
-      prismaUser = await getOrCreateUserByFirebaseUid(
+      await getOrCreateUserByFirebaseUid(
         userId,
         session?.user?.email ?? null,
         session?.user?.name ?? null
       );
-      canAccess = await hasActiveSubscription(prismaUser.id);
     } catch (error) {
-      console.error("Analytics subscription check failed:", error);
-      canAccess = false;
+      console.error("Analytics user init failed:", error);
     }
-  }
-  if (!canAccess) {
-    return <SubscriptionGate title="Sites & Analytics" />;
   }
 
   const { source: sourceParam, project: projectIdLegacy, days: daysParam } = await searchParams;

@@ -348,17 +348,13 @@ export default function SettingsPage() {
         <TabsContent value="team" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Team & Organization</CardTitle>
-              <CardDescription>Invite members and manage roles</CardDescription>
+              <CardTitle>Contact Support</CardTitle>
+              <CardDescription>Need help? Open a support ticket and we&apos;ll get back to you.</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-text-secondary mb-4">
-                Collaborate with your team by inviting members and assigning roles. Manage your organization settings.
-              </p>
               <Button asChild>
-                <Link href="/dashboard/web2/team">
-                  <Users className="mr-2 h-4 w-4" />
-                  Manage Team
+                <Link href="/dashboard/web2/support/new">
+                  Open Support Ticket
                 </Link>
               </Button>
             </CardContent>

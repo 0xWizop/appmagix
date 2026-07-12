@@ -42,13 +42,13 @@ function getPageContext(pathname: string): { subject: string; priority: string }
     return { subject: "Help with Reports", priority: "LOW" };
   }
   if (pathname.includes("/crm")) {
-    return { subject: "Help with CRM", priority: "MEDIUM" };
+    return { subject: "Help with my project", priority: "MEDIUM" };
   }
   if (pathname.includes("/booking")) {
-    return { subject: "Help with Bookings", priority: "MEDIUM" };
+    return { subject: "Help with scheduling", priority: "MEDIUM" };
   }
   if (pathname.includes("/brand-vault")) {
-    return { subject: "Help with Brand Vault", priority: "LOW" };
+    return { subject: "Help with assets", priority: "LOW" };
   }
   if (pathname.includes("/settings")) {
     return { subject: "Help with Settings", priority: "LOW" };

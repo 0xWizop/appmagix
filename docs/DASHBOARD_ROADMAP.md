@@ -1,4 +1,4 @@
-# MerchantMagix Dashboard Roadmap
+# Webmint Dashboard Roadmap
 
 **Platform:** App/website + SaaS for ecommerce  
 **Current:** Billing ✓ | Support ✓ | Apps ✓ | Projects ✓

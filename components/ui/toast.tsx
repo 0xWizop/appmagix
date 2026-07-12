@@ -24,7 +24,7 @@ ToastViewport.displayName = ToastPrimitive.Viewport.displayName;
 
 const toastVariants = {
   success:
-    "border-brand-green/50 bg-surface shadow-[0_0_20px_rgba(34,197,94,0.15)]",
+    "border-brand-green/50 bg-surface shadow-[0_0_20px_rgba(52,211,153,0.15)]",
   error:
     "border-red-500/50 bg-surface shadow-[0_0_20px_rgba(239,68,68,0.15)]",
   warning:

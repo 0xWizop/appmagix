@@ -2,71 +2,56 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper: true if user is signed in (Firebase Auth)
     function isSignedIn() {
       return request.auth != null;
     }
 
-    // Helper: true if requester is the document owner (by userId field)
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
+    function isOwner(ownerId) {
+      return isSignedIn() && request.auth.uid == ownerId;
     }
 
-    // Users: each user can read/write their own document (uid = doc id)
-    match /users/{userId} {
+    // User settings (preferences, brand colors)
+    match /user_settings/{userId} {
       allow read, write: if isOwner(userId);
     }
 
-    // Projects: users can CRUD their own projects (ownerId matches auth.uid)
+    // Projects (Firestore mirror for analytics linking)
     match /projects/{projectId} {
-      allow read, write: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-      // Milestones subcollection
-      match /milestones/{milestoneId} {
-        allow read, write: if isSignedIn() && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
-        allow create: if isSignedIn() && get(/databases/$(database)/documents/projects/$(projectId)).data.ownerId == request.auth.uid;
-      }
+      allow update: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
 
-    // Support tickets: users can CRUD their own tickets
-    match /tickets/{ticketId} {
-      allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    // Sites (connected for analytics)
+    match /sites/{siteId} {
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
+      allow update: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.ownerId == request.auth.uid;
     }
 
-    // Ticket messages (subcollection under tickets): same as ticket owner
-    match /tickets/{ticketId}/messages/{messageId} {
-      allow read, write: if isSignedIn() && get(/databases/$(database)/documents/tickets/$(ticketId)).data.userId == request.auth.uid;
-      allow create: if isSignedIn() && get(/databases/$(database)/documents/tickets/$(ticketId)).data.userId == request.auth.uid;
-    }
-
-    // Invoices: users can read their own invoices; only server can create
-    match /invoices/{invoiceId} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    // Analytics events — written by embed script (unauthenticated) or server
+    match /analytics_events/{eventId} {
+      allow read: if isSignedIn();
+      allow create: if true; // embed script posts anonymously
       allow update, delete: if false;
     }
 
-    // App settings / config (e.g. for your 4 Shopify apps): restrict to admins if you add custom claims, or read-only for all signed-in users
-    match /appConfig/{docId} {
-      allow read: if isSignedIn();
-      allow write: if false;
-    }
-
-    // Contacts (CRM): users can CRUD their own contacts
-    match /contacts/{contactId} {
-      allow read, write: if isSignedIn() && resource.data.ownerId == request.auth.uid;
-      allow create: if isSignedIn() && request.resource.data.ownerId == request.auth.uid;
-    }
-
-    // Notifications: users can read and update (mark read) their own; server creates via Admin SDK
+    // Notifications — server creates, user reads/marks read
     match /notifications/{notificationId} {
       allow read, update: if isSignedIn() && resource.data.userId == request.auth.uid;
-      allow create: if false;
-      allow delete: if false;
+      allow create, delete: if false;
     }
 
-    // Deny everything else by default
+    // Intakes — server creates via Admin SDK
+    match /intakes/{intakeId} {
+      allow read: if isSignedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if true; // public contact form
+      allow update, delete: if false;
+    }
+
+    // Deny everything else
     match /{document=**} {
       allow read, write: if false;
     }

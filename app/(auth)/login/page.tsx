@@ -101,7 +101,7 @@ function LoginForm() {
         <CardHeader className="text-center">
           <Link href="/" className="inline-block mb-4">
             <span className="text-2xl font-brand italic tracking-tight">
-              merchant<span className="text-brand-green">magix</span>.
+              web<span className="text-brand-green">mint</span>.
             </span>
           </Link>
           <CardTitle className="text-2xl text-white">Welcome back</CardTitle>

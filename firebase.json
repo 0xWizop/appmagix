@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "blastoff-2443e",
+    "site": "webmint-de64d",
     "source": ".",
     "ignore": [
       "firebase.json",
@@ -16,13 +16,7 @@
     ],
     "frameworksBackend": {
       "region": "us-central1"
-    },
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/__next"
-      }
-    ]
+    }
   },
   "firestore": {
     "rules": "firestore.rules",

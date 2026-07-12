@@ -43,5 +43,6 @@ prisma/*.db-journal
 
 # Firebase (never commit service account key)
 firebase-service-account.json
+webmint-service-account.json
 *-firebase-adminsdk-*.json
 .firebase/

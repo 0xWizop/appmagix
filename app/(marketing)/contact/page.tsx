@@ -21,8 +21,8 @@ const contactInfo = [
   {
     icon: Mail,
     label: "Email",
-    value: "hello@merchantmagix.com",
-    href: "mailto:hello@merchantmagix.com",
+    value: "hello@webmint.io",
+    href: "mailto:hello@webmint.io",
   },
   {
     icon: Phone,
@@ -45,11 +45,13 @@ const contactInfo = [
 ];
 
 const projectTypes = [
+  { value: "website", label: "Custom Website" },
+  { value: "web-app", label: "Web App / SaaS" },
+  { value: "mobile", label: "Mobile App" },
   { value: "shopify", label: "Shopify Build" },
-  { value: "custom", label: "Custom Build" },
-  { value: "redesign", label: "Store Redesign" },
-  { value: "migration", label: "Platform Migration" },
-  { value: "consulting", label: "Consulting/Strategy" },
+  { value: "landing-page", label: "Landing Page" },
+  { value: "redesign", label: "Redesign / Refresh" },
+  { value: "maintenance", label: "Maintenance / Updates" },
   { value: "other", label: "Other" },
 ];
 

@@ -1,42 +1,31 @@
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+const db = new PrismaClient();
 
 async function main() {
-  const testEmail = "test@merchantmagix.com";
-  const testPassword = "Test1234"; // Change in production!
+  const adminEmail = "merchantmagix@gmail.com";
 
-  const existing = await prisma.user.findUnique({
-    where: { email: testEmail },
-  });
-
+  const existing = await db.user.findUnique({ where: { email: adminEmail } });
   if (existing) {
-    console.log("Test user already exists. Use: test@merchantmagix.com / Test1234");
+    // Make sure they have ADMIN role
+    await db.user.update({ where: { email: adminEmail }, data: { role: "ADMIN" } });
+    console.log("✓ Admin user already exists — role set to ADMIN");
     return;
   }
 
-  const passwordHash = await bcrypt.hash(testPassword, 12);
-  await prisma.user.create({
+  const hash = await bcrypt.hash("Admin1234!", 10);
+  await db.user.create({
     data: {
-      email: testEmail,
-      name: "Test User",
-      passwordHash,
-      role: "CLIENT",
+      email: adminEmail,
+      name: "Webmint Admin",
+      passwordHash: hash,
+      role: "ADMIN",
     },
   });
-
-  console.log("✓ Created test user:");
-  console.log("  Email:    test@merchantmagix.com");
-  console.log("  Password: Test1234");
-  console.log("\nYou can now log in at http://localhost:3001/login");
+  console.log("✓ Created admin user: merchantmagix@gmail.com / Admin1234!");
 }
 
 main()
-  .catch((e) => {
-    console.error("Seed failed:", e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch((e) => { console.error(e); process.exit(1); })
+  .finally(() => db.$disconnect());

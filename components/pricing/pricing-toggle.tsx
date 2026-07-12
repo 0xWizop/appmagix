@@ -1,11 +1,9 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { CheckCircle, Globe, Code2, ArrowRight, Layout, ShoppingBag, Smartphone } from "lucide-react";
+import { CheckCircle, Code2, ArrowRight, ShoppingBag, Smartphone } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import { CheckoutButton } from "@/components/checkout-button";
 
 const customFeatures = [
@@ -26,50 +24,9 @@ const ecommerceFeatures = [
   "Works with any platform",
 ];
 
-type BillingCycle = "monthly" | "yearly";
-
 export function PricingToggle() {
-  const [billing, setBilling] = useState<BillingCycle>("monthly");
-
-  const saasMonthlyPrice = billing === "yearly" ? "$7.99" : "$9.99";
-  const saasYearlyNote = billing === "yearly" ? "billed annually" : "/month";
-
   return (
     <div className="space-y-8">
-      {/* Toggle */}
-      <div className="flex items-center justify-center gap-4">
-        <span className={cn("text-sm font-medium transition-colors", billing === "monthly" ? "text-white" : "text-text-muted")}>
-          Monthly
-        </span>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={billing === "yearly"}
-          onClick={() => setBilling(billing === "monthly" ? "yearly" : "monthly")}
-          className={cn(
-            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-green focus:ring-offset-2 focus:ring-offset-background",
-            billing === "yearly" ? "bg-brand-green" : "bg-surface-hover"
-          )}
-        >
-          <span
-            className={cn(
-              "inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform duration-200",
-              billing === "yearly" ? "translate-x-6" : "translate-x-1"
-            )}
-          />
-        </button>
-        <div className="flex items-center gap-2">
-          <span className={cn("text-sm font-medium transition-colors", billing === "yearly" ? "text-white" : "text-text-muted")}>
-            Yearly
-          </span>
-          {billing === "yearly" && (
-            <Badge className="bg-brand-green/20 text-brand-green border border-brand-green/30 text-xs animate-in fade-in duration-200">
-              Save 20%
-            </Badge>
-          )}
-        </div>
-      </div>
-
       {/* Pricing Cards */}
       <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
 
@@ -103,7 +60,7 @@ export function PricingToggle() {
             </ul>
             <div className="flex items-center gap-3 mt-auto pt-2">
               <div className="shrink-0">
-                <span className="text-3xl font-semibold">$1,500</span>
+                <span className="text-3xl font-semibold">$1,000</span>
                 <p className="text-xs text-text-muted leading-none mt-0.5">starting price</p>
               </div>
               <CheckoutButton productKey="custom_website_build" className="flex-1 whitespace-nowrap">
@@ -141,8 +98,8 @@ export function PricingToggle() {
             </ul>
             <div className="flex items-center gap-3 mt-auto pt-2">
               <div className="shrink-0">
-                <span className="text-3xl font-semibold">$500</span>
-                <p className="text-xs text-text-muted leading-none mt-0.5">+ platform fee</p>
+                <span className="text-3xl font-semibold">$300</span>
+                <p className="text-xs text-text-muted leading-none mt-0.5">starting price</p>
               </div>
               <CheckoutButton productKey="shopify_build" className="flex-1 whitespace-nowrap">
                 Get Started <ArrowRight className="ml-1.5 h-4 w-4" />
@@ -154,43 +111,41 @@ export function PricingToggle() {
           </CardContent>
         </Card>
 
-        {/* SaaS Monthly */}
+        {/* App / Custom Build */}
         <Card className="relative shadow-none border-border flex flex-col">
           <CardHeader>
             <div className="h-12 w-12 rounded-xl bg-brand-green-dark flex items-center justify-center mb-4">
-              <Layout className="h-6 w-6 text-white" />
+              <Smartphone className="h-6 w-6 text-white" />
             </div>
-            <CardTitle className="text-2xl">SaaS Monthly</CardTitle>
-            <CardDescription>Analytics & reporting, dashboard access, and ongoing tools</CardDescription>
+            <CardTitle className="text-2xl">App Build</CardTitle>
+            <CardDescription>Web apps, SaaS products, and mobile apps built to scale.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col flex-1">
             <ul className="space-y-3 mb-6 flex-1">
-              <li className="flex items-start gap-2 text-sm">
-                <CheckCircle className="h-4 w-4 text-brand-green mt-0.5 shrink-0" />
-                Analytics & reporting
-              </li>
-              <li className="flex items-start gap-2 text-sm">
-                <CheckCircle className="h-4 w-4 text-brand-green mt-0.5 shrink-0" />
-                Client dashboard & tools
-              </li>
-              <li className="flex items-start gap-2 text-sm">
-                <CheckCircle className="h-4 w-4 text-brand-green mt-0.5 shrink-0" />
-                Cancel anytime
-              </li>
+              {[
+                "Full-stack web apps",
+                "React Native mobile apps",
+                "API integrations",
+                "Auth & user management",
+                "Admin dashboards",
+                "Ongoing maintenance options",
+              ].map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm">
+                  <CheckCircle className="h-4 w-4 text-brand-green mt-0.5 shrink-0" />
+                  {f}
+                </li>
+              ))}
             </ul>
             <div className="flex items-center gap-3 mt-auto pt-2">
               <div className="shrink-0">
-                <span className="text-3xl font-semibold transition-all duration-300">{saasMonthlyPrice}</span>
-                <p className="text-xs text-text-muted leading-none mt-0.5">
-                  {billing === "yearly" ? "2 months free!" : "/month"}
-                </p>
-                {billing === "yearly" && (
-                  <p className="text-[10px] text-brand-green animate-in fade-in duration-200">{saasYearlyNote}</p>
-                )}
+                <span className="text-3xl font-semibold">Custom</span>
+                <p className="text-xs text-text-muted leading-none mt-0.5">contact for quote</p>
               </div>
-              <CheckoutButton productKey="saas_monthly_package" className="flex-1 whitespace-nowrap">
-                Subscribe <ArrowRight className="ml-1.5 h-4 w-4" />
-              </CheckoutButton>
+              <Link href="/contact" className="flex-1">
+                <button className="w-full whitespace-nowrap inline-flex items-center justify-center rounded-md bg-brand-green text-black font-medium text-sm px-4 py-2 hover:bg-brand-green/90 transition-colors">
+                  Get a Quote <ArrowRight className="ml-1.5 h-4 w-4" />
+                </button>
+              </Link>
             </div>
           </CardContent>
         </Card>

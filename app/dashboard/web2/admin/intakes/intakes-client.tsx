@@ -60,7 +60,7 @@ export function IntakesClient({ initialIntakes }: IntakesClientProps) {
                       <p className="text-sm text-text-muted">{intake.contactEmail}</p>
                     </div>
                     <Badge variant="secondary" className="capitalize shrink-0">
-                      {intake.projectType.replace("-", " ")}
+                      {intake.projectType?.replace("-", " ")}
                     </Badge>
                   </div>
                 </CardHeader>

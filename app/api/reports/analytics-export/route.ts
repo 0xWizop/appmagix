@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/firebase-session";
 import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
-import { hasActiveSubscription } from "@/lib/subscription";
 import { getAnalyticsForProject, getAnalyticsForSite } from "@/lib/firestore";
 import { getProjectsByOwner, getSitesByOwner } from "@/lib/firestore";
 
@@ -18,14 +17,11 @@ export async function GET(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const user = await getOrCreateUserByFirebaseUid(
+    await getOrCreateUserByFirebaseUid(
       session.user.id,
       session.user.email ?? null,
       session.user.name ?? null
     );
-    if (!(await hasActiveSubscription(user.id))) {
-      return NextResponse.json({ error: "Subscription required" }, { status: 403 });
-    }
 
     const { searchParams } = new URL(req.url);
     const source = searchParams.get("source");

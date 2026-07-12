@@ -6,26 +6,26 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { BookOpen, MessageSquare, FolderKanban, Users, CreditCard } from "lucide-react";
+import { BookOpen, MessageSquare, FolderKanban, CreditCard } from "lucide-react";
 
 const categories = [
   {
     title: "Getting Started",
-    description: "Learn the basics of your dashboard",
+    description: "Create your account and get set up",
     icon: BookOpen,
     href: "/help/getting-started",
   },
   {
     title: "Projects",
-    description: "Track your website builds",
+    description: "Track your website and app builds",
     icon: FolderKanban,
     href: "/help/projects",
   },
   {
-    title: "Team & Organizations",
-    description: "Invite members and manage roles",
-    icon: Users,
-    href: "/help/team",
+    title: "Support Tickets",
+    description: "Request changes and get help",
+    icon: MessageSquare,
+    href: "/help/support",
   },
   {
     title: "Billing",
@@ -33,34 +33,32 @@ const categories = [
     icon: CreditCard,
     href: "/help/billing",
   },
-  {
-    title: "Support",
-    description: "Submit tickets and get help",
-    icon: MessageSquare,
-    href: "/help/support",
-  },
 ];
 
 const faqs = [
   {
     q: "How do I track my project progress?",
-    a: "Go to Dashboard → Projects to see all your projects. Each project shows milestones and progress. Click a project for detailed status, milestones, and support tickets.",
+    a: "Go to Dashboard → Projects to see all your projects. Each project shows milestones and a progress bar. Click a project for detailed status, timeline, and your task list.",
   },
   {
-    q: "How do I invite team members?",
-    a: "Create an organization in Team, then use Invite Member to send an invite link by email. The recipient signs in (or creates an account) and accepts the invite to join your org.",
-  },
-  {
-    q: "Where do I submit a support ticket?",
-    a: "Go to Dashboard → Support and click New Ticket. Describe your issue and we'll respond as soon as possible.",
+    q: "How do I request a change or update to my site?",
+    a: "Go to Dashboard → Support and click New Ticket. Describe what you need — you can attach it to a specific project. We typically respond within 24 hours.",
   },
   {
     q: "How do I connect my website for analytics?",
-    a: "In your project page, use Connect Site to add your website URL. We'll give you a verification token to add to your site. Once verified, analytics will start tracking.",
+    a: "Go to Sites & Analytics in your dashboard sidebar. Add your site domain and copy the embed snippet. Paste it into your site's <head> tag and we'll verify it automatically.",
   },
   {
-    q: "What's the difference between User and Developer mode?",
-    a: "User mode shows core tools: Dashboard, Projects, File Convert, Support, Billing. Developer mode adds Playground and API Builder for dev utilities. Toggle in the sidebar.",
+    q: "How does billing work?",
+    a: "Invoices are created by our team as work progresses. You'll see them in Dashboard → Billing. Pending invoices have a Pay Now button — payments are processed securely via Stripe.",
+  },
+  {
+    q: "Can I download my invoices?",
+    a: "Yes — open any invoice in Dashboard → Billing and click the download icon to get a PDF receipt.",
+  },
+  {
+    q: "What if I need urgent help?",
+    a: "Open a support ticket and set the priority to High. You can also email us directly at hello@webmint.io.",
   },
 ];
 

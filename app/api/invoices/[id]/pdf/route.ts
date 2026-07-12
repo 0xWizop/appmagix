@@ -220,7 +220,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
   <div class="page">
     <!-- Header -->
     <div class="header">
-      <div class="logo">merchant<span>magix</span>.</div>
+      <div class="logo">web<span>mint</span>.</div>
       <div class="invoice-meta">
         <div class="invoice-number">${invoice.invoiceNumber}</div>
         <div class="invoice-date">Created ${fmtDate(invoice.createdAt)}</div>
@@ -233,8 +233,8 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
       <div class="parties">
         <div>
           <div class="party-label">From</div>
-          <div class="party-name">MerchantMagix</div>
-          <div class="party-detail">merchantmagix@gmail.com</div>
+          <div class="party-name">Webmint</div>
+          <div class="party-detail">hello@webmint.io</div>
         </div>
         <div>
           <div class="party-label">Bill To</div>
@@ -297,7 +297,7 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     <!-- Footer -->
     <div class="footer">
       <div class="footer-note">Thank you for your business!</div>
-      <a href="https://merchantmagix.com" class="footer-link">merchantmagix.com</a>
+      <a href="https://webmint.io" class="footer-link">webmint.io</a>
     </div>
   </div>
 </body>

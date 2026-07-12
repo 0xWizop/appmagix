@@ -22,7 +22,7 @@ export function InteractiveFeatureCard({ icon: Icon, title, description, details
       onHoverEnd={() => setExpanded(false)}
       whileHover={{
         y: -4,
-        boxShadow: "0 20px 40px -12px rgba(0,0,0,0.4), 0 0 0 1px rgba(34, 197, 94, 0.15)",
+        boxShadow: "0 20px 40px -12px rgba(0,0,0,0.4), 0 0 0 1px rgba(52, 211, 153, 0.15)",
       }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >

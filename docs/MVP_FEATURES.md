@@ -1,4 +1,4 @@
-# MVP Feature Brainstorm – MerchantMagix
+# MVP Feature Brainstorm – Webmint
 
 Ecommerce agency site + client dashboard. This doc is a **brainstorm** of what could count as MVP—pick and narrow based on your first launch goal.
 

@@ -18,12 +18,12 @@ require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 
 const requiredVars = {
   DATABASE_URL: process.env.DATABASE_URL,
-  NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'https://merchantmagix-5c6cd.web.app',
+  NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'https://webmint.io',
   NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   AUTH_SECRET: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://merchantmagix-5c6cd.web.app',
+  NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'https://webmint.io',
   NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
   NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,

@@ -12,11 +12,11 @@ const articles: Record<
     content: [
       {
         type: "paragraph",
-        text: "Welcome to MerchantMagix. Your dashboard is the hub for tracking projects, managing your team, and accessing tools.",
+        text: "Welcome to Webmint. Your dashboard is the hub for tracking your project, submitting change requests, viewing analytics, and managing invoices.",
       },
       {
         type: "paragraph",
-        text: "After signing in, you'll see the main dashboard with quick stats, recent activity, and shortcuts to common tasks.",
+        text: "After signing in, you'll see the main dashboard with your project status, open tickets, and pending invoices.",
       },
       {
         type: "paragraph",
@@ -25,16 +25,12 @@ const articles: Record<
       {
         type: "list",
         items: [
-          "Projects — View and track your website builds",
-          "Team — Create an org and invite members",
-          "Support — Submit tickets when you need help",
-          "Billing — View invoices and payment history",
-          "File Convert — Convert files (data, images, video)",
+          "Projects — View and track your website or app build",
+          "Request Work — Submit a new project or change request",
+          "Support — Open tickets when you need a change or have a question",
+          "Billing — View invoices and make payments",
+          "Sites & Analytics — Connect your site and track traffic",
         ],
-      },
-      {
-        type: "paragraph",
-        text: "Use the User/Developer toggle in the sidebar to switch between a simplified view and full dev tools (Playground, API Builder).",
       },
     ],
   },
@@ -43,41 +39,48 @@ const articles: Record<
     content: [
       {
         type: "paragraph",
-        text: "Projects represent your website builds. Each project has a status (Discovery, Design, Development, Review, Launched) and milestones.",
+        text: "Projects represent your active builds. Each project has a status — Discovery, Design, Development, Review, or Launched — and a set of milestones our team updates as we progress.",
       },
       {
         type: "paragraph",
-        text: "Click a project to see milestones, support tickets, and invoices. You can also connect your live site for analytics.",
+        text: "Click a project to see the full timeline, milestone progress, your task list, and linked invoices.",
       },
       {
         type: "paragraph",
-        text: "To connect your site: add your website URL, copy the verification token we provide, and add it to your site's HTML as a meta tag. We'll verify and start tracking page views.",
+        text: "To request a change: use the Task list on the project page to add a change request, or click 'Request Change' to open a support ticket linked to that project.",
+      },
+      {
+        type: "paragraph",
+        text: "To connect your site for analytics: add your website URL in the project sidebar, copy the verification snippet, and paste it into your site's <head> tag. We'll verify automatically.",
       },
     ],
   },
-  team: {
-    title: "Team & Organizations",
+  support: {
+    title: "Support Tickets",
     content: [
       {
         type: "paragraph",
-        text: "Create an organization to collaborate with your team. Only Owners and Admins can invite members.",
+        text: "Submit a support ticket from Dashboard → Support → New Ticket. Attach it to a project if relevant, add a subject, and describe what you need.",
       },
       {
         type: "paragraph",
-        text: "To invite: enter the email and role (Admin, Member, or Viewer), then Send Invite. Copy the invite link and share it. The recipient signs in with that email and accepts the invite.",
+        text: "We respond within 24 hours. You can reply directly in the ticket thread to continue the conversation.",
       },
       {
         type: "paragraph",
-        text: "Roles:",
+        text: "Ticket statuses:",
       },
       {
         type: "list",
         items: [
-          "Owner — Full control, can delete org",
-          "Admin — Can invite and manage members",
-          "Member — Can view and use org resources",
-          "Viewer — Read-only access",
+          "Open — New ticket, not yet picked up",
+          "In Progress — Our team is working on it",
+          "Resolved — Done and closed",
         ],
+      },
+      {
+        type: "paragraph",
+        text: "For urgent issues, set the priority to High when creating the ticket.",
       },
     ],
   },
@@ -86,24 +89,15 @@ const articles: Record<
     content: [
       {
         type: "paragraph",
-        text: "View invoices and payment history in Dashboard → Billing. Pending invoices require action; paid invoices are marked complete.",
+        text: "View all invoices in Dashboard → Billing. Pending invoices show a Pay Now button — payments are processed securely via Stripe.",
       },
       {
         type: "paragraph",
-        text: "Stripe integration for online payments is coming soon. Until then, invoice payments are handled offline.",
-      },
-    ],
-  },
-  support: {
-    title: "Support",
-    content: [
-      {
-        type: "paragraph",
-        text: "Submit a support ticket from Dashboard → Support → New Ticket. Include the project (if relevant), subject, and description.",
+        text: "Paid invoices are marked with a green badge. Click the download icon on any invoice to get a PDF receipt.",
       },
       {
         type: "paragraph",
-        text: "We'll respond as soon as possible. You can reply to tickets to continue the conversation. Resolved tickets stay in your history for reference.",
+        text: "If you have a question about an invoice, open a support ticket and we'll sort it out quickly.",
       },
     ],
   },
@@ -151,7 +145,7 @@ export default async function HelpArticlePage({
           <div className="mt-12 pt-8 border-t border-border">
             <p className="text-text-muted text-sm mb-2">Need more help?</p>
             <Link href="/contact" className="text-brand-green hover:underline">
-              Contact support
+              Contact us
             </Link>
           </div>
         </div>

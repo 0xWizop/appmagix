@@ -40,7 +40,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
           <Sidebar />
         </div>
         <MobileNav />
-        <main className="flex-1 min-w-0 lg:ml-0 overflow-auto relative z-10 dashboard-grid-bg">
+        <main className="flex-1 min-w-0 lg:ml-0 overflow-auto relative z-10">
           <div className="pt-14 lg:pt-0 min-h-full relative z-10 flex flex-col">
             <DashboardBanner />
             <div className="flex-1">

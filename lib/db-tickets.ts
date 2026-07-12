@@ -57,12 +57,46 @@ export async function getTicketWithMessagesByPrismaUserId(
       content: m.content,
       createdAt: m.createdAt,
       sender: m.sender
-        ? {
-            name: m.sender.name,
-            email: m.sender.email,
-            avatarUrl: m.sender.avatarUrl,
-            role: m.sender.role,
-          }
+        ? { name: m.sender.name, email: m.sender.email, avatarUrl: m.sender.avatarUrl, role: m.sender.role }
+        : undefined,
+    })),
+  };
+}
+
+// Admin version — can access any ticket regardless of owner
+export async function getTicketWithMessagesAdmin(ticketId: string) {
+  const ticket = await db.ticket.findFirst({
+    where: { id: ticketId },
+    include: {
+      user: { select: { name: true, email: true } },
+      project: { select: { name: true } },
+      messages: {
+        orderBy: { createdAt: "asc" },
+        include: { sender: { select: { name: true, email: true, avatarUrl: true, role: true } } },
+      },
+    },
+  });
+  if (!ticket) return null;
+  return {
+    id: ticket.id,
+    userId: ticket.userId,
+    projectId: ticket.projectId,
+    subject: ticket.subject,
+    description: ticket.description,
+    status: ticket.status,
+    priority: ticket.priority,
+    createdAt: ticket.createdAt,
+    updatedAt: ticket.updatedAt,
+    user: ticket.user,
+    project: ticket.project ? { name: ticket.project.name } : undefined,
+    messages: ticket.messages.map((m) => ({
+      id: m.id,
+      ticketId: m.ticketId,
+      senderId: m.senderId,
+      content: m.content,
+      createdAt: m.createdAt,
+      sender: m.sender
+        ? { name: m.sender.name, email: m.sender.email, avatarUrl: m.sender.avatarUrl, role: m.sender.role }
         : undefined,
     })),
   };

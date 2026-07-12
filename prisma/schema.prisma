@@ -3,58 +3,9 @@ generator client {
   binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
 }
 
-
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-}
-
-enum UserRole {
-  CLIENT
-  ADMIN
-}
-
-enum ProjectType {
-  SHOPIFY
-  CUSTOM
-}
-
-enum ProjectStatus {
-  DISCOVERY
-  DESIGN
-  DEVELOPMENT
-  REVIEW
-  LAUNCHED
-}
-
-enum MilestoneStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-}
-
-enum TicketStatus {
-  OPEN
-  IN_PROGRESS
-  RESOLVED
-}
-
-enum TicketPriority {
-  LOW
-  MEDIUM
-  HIGH
-}
-
-enum InvoiceStatus {
-  PENDING
-  PAID
-  CANCELLED
-}
-
-enum BookingStatus {
-  SCHEDULED
-  COMPLETED
-  CANCELLED
 }
 
 model User {
@@ -63,40 +14,20 @@ model User {
   name          String?
   passwordHash  String?   @map("password_hash")
   avatarUrl     String?   @map("avatar_url")
-  role          UserRole  @default(CLIENT)
+  role          String    @default("CLIENT")
   emailVerified DateTime? @map("email_verified")
   firebaseUid   String?   @unique @map("firebase_uid")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  // Relations
   accounts       Account[]
   sessions       Session[]
   projects       Project[]
   tickets        Ticket[]
   ticketMessages TicketMessage[]
   invoices       Invoice[]
-  bookings       Booking[]
-  bookingLinks   BookingLink[]
-  subscriptions  Subscription[]
 
   @@map("users")
-}
-
-// SaaS subscription (e.g. $9.99/mo) — updated by Stripe webhooks
-model Subscription {
-  id                   String   @id @default(cuid())
-  userId               String   @unique @map("user_id")
-  stripeSubscriptionId String?  @unique @map("stripe_subscription_id")
-  stripeCustomerId     String?  @map("stripe_customer_id")
-  status               String   @default("active") // active, canceled, past_due, etc.
-  currentPeriodEnd     DateTime? @map("current_period_end")
-  createdAt            DateTime @default(now()) @map("created_at")
-  updatedAt            DateTime @updatedAt @map("updated_at")
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("subscriptions")
 }
 
 model Account {
@@ -105,12 +36,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String  @map("provider_account_id")
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -140,58 +71,54 @@ model VerificationToken {
 }
 
 model Project {
-  id               String        @id @default(cuid())
-  userId           String        @map("user_id")
+  id               String    @id @default(cuid())
+  userId           String    @map("user_id")
   name             String
-  description      String?       @db.Text
-  type             ProjectType
-  status           ProjectStatus @default(DISCOVERY)
-  startDate        DateTime?     @map("start_date")
-  targetLaunchDate DateTime?     @map("target_launch_date")
-  websiteUrl       String?       @map("website_url")
-  createdAt        DateTime      @default(now()) @map("created_at")
-  updatedAt        DateTime      @updatedAt @map("updated_at")
+  description      String?
+  type             String    @default("CUSTOM")
+  status           String    @default("DISCOVERY")
+  startDate        DateTime? @map("start_date")
+  targetLaunchDate DateTime? @map("target_launch_date")
+  websiteUrl       String?   @map("website_url")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
-  // Relations
   user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   milestones ProjectMilestone[]
   tickets    Ticket[]
   invoices   Invoice[]
-  bookings  Booking[]
 
   @@map("projects")
 }
 
 model ProjectMilestone {
-  id          String          @id @default(cuid())
-  projectId   String          @map("project_id")
+  id          String    @id @default(cuid())
+  projectId   String    @map("project_id")
   title       String
-  description String?         @db.Text
-  status      MilestoneStatus @default(PENDING)
-  dueDate     DateTime?       @map("due_date")
-  completedAt DateTime?       @map("completed_at")
-  sortOrder   Int             @default(0) @map("sort_order")
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
+  description String?
+  status      String    @default("PENDING")
+  dueDate     DateTime? @map("due_date")
+  completedAt DateTime? @map("completed_at")
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  // Relations
   project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@map("project_milestones")
 }
 
 model Ticket {
-  id          String         @id @default(cuid())
-  userId      String         @map("user_id")
-  projectId   String?        @map("project_id")
+  id          String   @id @default(cuid())
+  userId      String   @map("user_id")
+  projectId   String?  @map("project_id")
   subject     String
-  description String         @db.Text
-  status      TicketStatus   @default(OPEN)
-  priority    TicketPriority @default(MEDIUM)
-  createdAt   DateTime       @default(now()) @map("created_at")
-  updatedAt   DateTime       @updatedAt @map("updated_at")
+  description String
+  status      String   @default("OPEN")
+  priority    String   @default("MEDIUM")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  // Relations
   user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   project  Project?        @relation(fields: [projectId], references: [id], onDelete: SetNull)
   messages TicketMessage[]
@@ -203,10 +130,9 @@ model TicketMessage {
   id        String   @id @default(cuid())
   ticketId  String   @map("ticket_id")
   senderId  String   @map("sender_id")
-  content   String   @db.Text
+  content   String
   createdAt DateTime @default(now()) @map("created_at")
 
-  // Relations
   ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   sender User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
@@ -214,22 +140,21 @@ model TicketMessage {
 }
 
 model Invoice {
-  id              String        @id @default(cuid())
-  userId          String        @map("user_id")
-  projectId       String?       @map("project_id")
-  invoiceNumber   String        @unique @map("invoice_number")
-  amount          Int           // Amount in cents
-  status          InvoiceStatus @default(PENDING)
-  description     String?       @db.Text
-  dueDate         DateTime?     @map("due_date")
-  paidAt          DateTime?     @map("paid_at")
-  stripeInvoiceId String?       @unique @map("stripe_invoice_id")
-  stripePaymentUrl String?      @map("stripe_payment_url")
-  pdfUrl          String?       @map("pdf_url")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
+  id               String    @id @default(cuid())
+  userId           String    @map("user_id")
+  projectId        String?   @map("project_id")
+  invoiceNumber    String    @unique @map("invoice_number")
+  amount           Int
+  status           String    @default("PENDING")
+  description      String?
+  dueDate          DateTime? @map("due_date")
+  paidAt           DateTime? @map("paid_at")
+  stripeInvoiceId  String?   @unique @map("stripe_invoice_id")
+  stripePaymentUrl String?   @map("stripe_payment_url")
+  pdfUrl           String?   @map("pdf_url")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
 
-  // Relations
   user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
@@ -237,92 +162,14 @@ model Invoice {
 }
 
 model ContactSubmission {
-  id           String   @id @default(cuid())
-  name         String
-  email        String
-  projectType  String?  @map("project_type")
-  budgetRange  String?  @map("budget_range")
-  message      String   @db.Text
-  isRead       Boolean  @default(false) @map("is_read")
-  createdAt    DateTime @default(now()) @map("created_at")
+  id          String   @id @default(cuid())
+  name        String
+  email       String
+  projectType String?  @map("project_type")
+  budgetRange String?  @map("budget_range")
+  message     String
+  isRead      Boolean  @default(false) @map("is_read")
+  createdAt   DateTime @default(now()) @map("created_at")
 
   @@map("contact_submissions")
-}
-
-// CRM contacts (ownerId = Firebase UID for dashboard users)
-model Contact {
-  id        String   @id @default(cuid())
-  ownerId   String   @map("owner_id")
-  name      String
-  email     String?
-  phone     String?
-  company   String?
-  notes     String?  @db.Text
-  stage     String   @default("LEAD")
-  projectId String?  @map("project_id")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("contacts")
-}
-
-// Organizations (ownerId = Firebase UID)
-model Organization {
-  id        String   @id @default(cuid())
-  ownerId   String   @map("owner_id")
-  name      String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  members   OrgMember[]
-
-  @@map("organizations")
-}
-
-model OrgMember {
-  id             String       @id @default(cuid())
-  organizationId String       @map("organization_id")
-  userId         String       @map("user_id")
-  role           String       @default("MEMBER")
-  joinedAt       DateTime     @default(now()) @map("joined_at")
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-
-  @@map("org_members")
-}
-
-// Shareable booking link (host sends to clients; clients book a slot)
-model BookingLink {
-  id               String   @id @default(cuid())
-  ownerId          String   @map("owner_id")
-  title            String
-  slug             String   @unique
-  durationMinutes  Int      @default(30) @map("duration_minutes")
-  active           Boolean  @default(true)
-  createdAt        DateTime @default(now()) @map("created_at")
-  updatedAt        DateTime @updatedAt @map("updated_at")
-
-  owner   User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
-  bookings Booking[]
-
-  @@map("booking_links")
-}
-
-// Booking calendar (management section)
-model Booking {
-  id             String       @id @default(cuid())
-  userId         String       @map("user_id")
-  projectId      String?      @map("project_id")
-  bookingLinkId  String?      @map("booking_link_id")
-  title          String
-  description    String?      @db.Text
-  startTime      DateTime     @map("start_time")
-  endTime        DateTime     @map("end_time")
-  status         BookingStatus @default(SCHEDULED)
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime     @updatedAt @map("updated_at")
-
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project     Project?     @relation(fields: [projectId], references: [id], onDelete: SetNull)
-  bookingLink BookingLink? @relation(fields: [bookingLinkId], references: [id], onDelete: SetNull)
-
-  @@map("bookings")
 }

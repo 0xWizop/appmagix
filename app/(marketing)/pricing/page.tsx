@@ -163,16 +163,16 @@ export default function PricingPage() {
           <Card className="bg-gradient-to-br from-brand-green/10 via-transparent to-transparent border-brand-green/20 shadow-none">
             <CardContent className="p-8 md:p-12 text-center">
               <h2 className="text-3xl font-medium mb-4">
-                Not sure which plan is right for you?
+                Not sure which option is right for you?
               </h2>
               <p className="text-text-secondary mb-8 max-w-xl mx-auto">
-                Book a free consultation and we&apos;ll help you figure out the best
-                approach for your business and budget.
+                Fill out our project form and we&apos;ll review your needs and recommend
+                the best approach — no calls required.
               </p>
               <Button size="xl" asChild>
                 <Link href="/contact">
                   <MessageSquare className="mr-2 h-5 w-5" />
-                  Book a Free Call
+                  Get a Free Quote
                 </Link>
               </Button>
             </CardContent>

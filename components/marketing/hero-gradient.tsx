@@ -11,10 +11,10 @@ export function HeroGradient() {
         className="absolute inset-0"
         style={{
           background: `
-            radial-gradient(ellipse 100% 60% at 50% -10%, rgba(34, 197, 94, 0.18) 0%, transparent 55%),
-            radial-gradient(ellipse 70% 50% at 90% 30%, rgba(34, 197, 94, 0.1) 0%, transparent 45%),
-            radial-gradient(ellipse 60% 40% at 10% 60%, rgba(34, 197, 94, 0.08) 0%, transparent 40%),
-            radial-gradient(ellipse 50% 35% at 70% 85%, rgba(34, 197, 94, 0.06) 0%, transparent 40%)
+            radial-gradient(ellipse 100% 60% at 50% -10%, rgba(52, 211, 153, 0.18) 0%, transparent 55%),
+            radial-gradient(ellipse 70% 50% at 90% 30%, rgba(52, 211, 153, 0.1) 0%, transparent 45%),
+            radial-gradient(ellipse 60% 40% at 10% 60%, rgba(52, 211, 153, 0.08) 0%, transparent 40%),
+            radial-gradient(ellipse 50% 35% at 70% 85%, rgba(52, 211, 153, 0.06) 0%, transparent 40%)
           `,
         }}
       />

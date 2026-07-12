@@ -104,7 +104,7 @@ export function DocsSearch() {
               <span className="flex items-center gap-1"><kbd className="rounded bg-surface px-1.5 py-0.5 border border-border">↑↓</kbd> to navigate</span>
               <span className="flex items-center gap-1"><kbd className="rounded bg-surface px-1.5 py-0.5 border border-border">↵</kbd> to select</span>
             </div>
-            <span className="flex items-center gap-1">Search powered by <span className="text-brand-green font-brand italic">magix</span></span>
+            <span className="flex items-center gap-1">Search powered by <span className="text-brand-green font-brand italic">webmint</span></span>
           </div>
         </DialogContent>
       </Dialog>

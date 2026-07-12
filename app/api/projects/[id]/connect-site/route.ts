@@ -34,8 +34,8 @@ export async function POST(
     return NextResponse.json({
       token: result.token,
       websiteUrl: url,
-      metaTag: `<meta name="merchantmagix-site" content="${result.token}">`,
-      embedScript: `<script async src="${process.env.NEXT_PUBLIC_APP_URL || "https://merchantmagix.com"}/embed.js?token=${result.token}"></script>`,
+      metaTag: `<meta name="webmint-site" content="${result.token}">`,
+      embedScript: `<script async src="${process.env.NEXT_PUBLIC_APP_URL || "https://webmint.io"}/embed.js?token=${result.token}"></script>`,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

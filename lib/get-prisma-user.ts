@@ -8,30 +8,26 @@ export async function getOrCreateUserByFirebaseUid(
   firebaseUid: string,
   email: string | null,
   name: string | null
-): Promise<{ id: string; email: string; name: string | null }> {
+): Promise<{ id: string; email: string; name: string | null; role: string }> {
   const existing = await db.user.findUnique({
     where: { firebaseUid },
+    select: { id: true, email: true, name: true, role: true },
   });
   if (existing) return existing;
 
   const safeEmail = email?.trim() || `user-${firebaseUid}@placeholder.local`;
   const existingByEmail = await db.user.findUnique({
     where: { email: safeEmail },
+    select: { id: true, email: true, name: true, role: true },
   });
   if (existingByEmail) {
-    await db.user.update({
-      where: { id: existingByEmail.id },
-      data: { firebaseUid },
-    });
+    await db.user.update({ where: { id: existingByEmail.id }, data: { firebaseUid } });
     return existingByEmail;
   }
 
   const created = await db.user.create({
-    data: {
-      firebaseUid,
-      email: safeEmail,
-      name: name?.trim() || null,
-    },
+    data: { firebaseUid, email: safeEmail, name: name?.trim() || null },
+    select: { id: true, email: true, name: true, role: true },
   });
   return created;
 }

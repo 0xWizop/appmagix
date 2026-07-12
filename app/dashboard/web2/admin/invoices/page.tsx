@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatCurrency } from "@/lib/utils";
-import { FileText, DollarSign, Clock, CheckCircle, Plus } from "lucide-react";
+import { FileText, DollarSign, Clock, CheckCircle } from "lucide-react";
+import { CreateInvoiceForm } from "@/app/dashboard/web2/billing/create-invoice-form";
 
 const statusColors: Record<string, "default" | "secondary" | "success" | "warning" | "error"> = {
   PENDING: "warning",
@@ -54,12 +55,7 @@ export default async function AdminInvoicesPage() {
             Manage client invoices and payments
           </p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/web2/admin/invoices/new">
-            <Plus className="mr-2 h-4 w-4" />
-            Create Invoice
-          </Link>
-        </Button>
+        <CreateInvoiceForm />
       </div>
 
       {/* Stats */}
@@ -184,12 +180,7 @@ export default async function AdminInvoicesPage() {
             <p className="text-text-secondary mb-6">
               Create your first invoice to get started.
             </p>
-            <Button asChild>
-              <Link href="/dashboard/web2/admin/invoices/new">
-                <Plus className="mr-2 h-4 w-4" />
-                Create Invoice
-              </Link>
-            </Button>
+            <CreateInvoiceForm />
           </CardContent>
         </Card>
       )}

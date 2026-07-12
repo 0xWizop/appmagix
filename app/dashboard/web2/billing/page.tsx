@@ -31,6 +31,7 @@ export default async function BillingPage() {
   let invoices: { id: string; invoiceNumber: string; amount: number; status: string; description: string | null; dueDate: Date | null; paidAt: Date | null; createdAt: Date; project?: { name: string }; stripePaymentUrl?: string | null; pdfUrl?: string | null }[] = [];
   let stats = { total: 0, paid: 0, pending: 0 };
   let projectCount = 0;
+  let isAdmin = false;
 
   try {
     if (session?.user?.id) {
@@ -39,6 +40,7 @@ export default async function BillingPage() {
         session.user.email,
         session.user.name
       );
+      isAdmin = user.role === "ADMIN" || session.user.email === "merchantmagix@gmail.com";
       const [invList, count] = await Promise.all([
         db.invoice.findMany({
           where: { userId: user.id },
@@ -81,7 +83,7 @@ export default async function BillingPage() {
             Invoices, payment history, and usage overview.
           </p>
         </div>
-        <CreateInvoiceForm />
+        {isAdmin && <CreateInvoiceForm />}
       </div>
       <PageTips className="mb-6" />
 

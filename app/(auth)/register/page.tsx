@@ -111,12 +111,12 @@ export default function RegisterPage() {
         <CardHeader className="text-center">
           <Link href="/" className="inline-block mb-4">
             <span className="text-2xl font-brand italic tracking-tight">
-              merchant<span className="text-brand-green">magix</span>.
+              web<span className="text-brand-green">mint</span>.
             </span>
           </Link>
           <CardTitle className="text-2xl text-white">Create an account</CardTitle>
           <CardDescription className="text-white/70">
-            Get started with your merchantmagix dashboard
+            Get started with your Webmint dashboard
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

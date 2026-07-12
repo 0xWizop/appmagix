@@ -1,4 +1,4 @@
-# MerchantMagix
+# Webmint
 
 A full-stack ecommerce agency website and client dashboard built with Next.js 14, featuring a modern marketing site and comprehensive SaaS dashboard for managing website builds.
 

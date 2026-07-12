@@ -4,12 +4,11 @@ import { Separator } from "@/components/ui/separator";
 const footerLinks = {
   services: [
     { name: "Web & App Development", href: "/services" },
-    { name: "Shopify & Ecommerce", href: "/services#shopify" },
+    { name: "Shopify & Ecommerce", href: "/services#ecommerce" },
   ],
   company: [
     { name: "Work", href: "/work" },
     { name: "Pricing", href: "/pricing" },
-    { name: "Documentation", href: "/docs" },
     { name: "Help", href: "/help" },
     { name: "Contact", href: "/contact" },
   ],
@@ -63,7 +62,7 @@ export function Footer() {
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="inline-block mb-4">
               <span className="text-2xl font-brand italic tracking-tight">
-                merchant<span className="text-brand-green">magix</span>.
+                web<span className="text-brand-green">mint</span>.
               </span>
             </Link>
             <p className="text-sm text-text-secondary mb-4">
@@ -143,7 +142,7 @@ export function Footer() {
 
         {/* Bottom Footer */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-text-muted">
-          <p>&copy; {new Date().getFullYear()} merchantmagix. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} webmint. All rights reserved.</p>
           <p>Apps, websites & ecommerce—built for you</p>
         </div>
       </div>
