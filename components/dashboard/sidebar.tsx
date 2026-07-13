@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useFirebaseAuth } from "@/lib/firebase-auth-context";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -88,9 +89,7 @@ export function Sidebar() {
       {/* Logo */}
       <div className="flex h-16 items-center px-6 border-b border-border">
         <Link href="/" className="flex items-center">
-          <span className="text-xl font-brand italic tracking-tight">
-            web<span className="text-brand-green">mint</span>.
-          </span>
+          <Logo size={28} textClassName="text-xl" />
         </Link>
       </div>
 

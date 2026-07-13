@@ -6,6 +6,7 @@ import { useFirebaseAuth } from "@/lib/firebase-auth-context";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/logo";
 
 const navigation = [
   { name: "Services", href: "/services" },
@@ -34,10 +35,8 @@ export function Header() {
       )}
     >
       <nav className="container-width section-padding !py-4 flex items-center justify-between">
-        <Link href="/" className="flex items-center group">
-          <span className="text-2xl font-brand italic tracking-tight text-text-primary transition-colors group-hover:opacity-90">
-            web<span className="text-brand-green">mint</span>.
-          </span>
+        <Link href="/" className="flex items-center group transition-opacity group-hover:opacity-90">
+          <Logo size={32} textClassName="text-2xl" />
         </Link>
 
         <div className="hidden md:flex items-center gap-8">

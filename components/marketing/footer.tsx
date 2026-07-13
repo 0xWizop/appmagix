@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { Logo } from "@/components/logo";
 
 const footerLinks = {
   services: [
@@ -61,9 +62,7 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-2 md:col-span-1">
             <Link href="/" className="inline-block mb-4">
-              <span className="text-2xl font-brand italic tracking-tight">
-                web<span className="text-brand-green">mint</span>.
-              </span>
+              <Logo size={32} textClassName="text-2xl" />
             </Link>
             <p className="text-sm text-text-secondary mb-4">
               Custom web apps, websites, and ecommerce. We build what you need—with

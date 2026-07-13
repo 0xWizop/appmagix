@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useFirebaseAuth } from "@/lib/firebase-auth-context";
 import { cn } from "@/lib/utils";
+import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -83,9 +84,7 @@ export function MobileNav() {
       {/* Mobile Header */}
       <div className="fixed top-0 left-0 right-0 z-50 flex h-14 items-center justify-between border-b border-border bg-surface px-4 lg:hidden">
         <Link href="/" className="flex items-center">
-          <span className="text-xl font-brand italic tracking-tight">
-            web<span className="text-brand-green">mint</span>.
-          </span>
+          <Logo size={26} textClassName="text-lg" />
         </Link>
         <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)}>
           {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}

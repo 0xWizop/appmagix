@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { Loader2, User, Wrench } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 const GOOGLE_ENABLED = !!(
   process.env.NEXT_PUBLIC_FIREBASE_API_KEY &&
@@ -109,10 +110,8 @@ export default function RegisterPage() {
 
       <Card className="w-full max-w-md relative bg-black border-2 border-brand-green/30 shadow-xl shadow-black/40">
         <CardHeader className="text-center">
-          <Link href="/" className="inline-block mb-4">
-            <span className="text-2xl font-brand italic tracking-tight">
-              web<span className="text-brand-green">mint</span>.
-            </span>
+          <Link href="/" className="inline-flex mb-4 justify-center">
+            <Logo size={36} textClassName="text-2xl" />
           </Link>
           <CardTitle className="text-2xl text-white">Create an account</CardTitle>
           <CardDescription className="text-white/70">

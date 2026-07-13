@@ -14,8 +14,12 @@ export const metadata: Metadata = {
     default: "Webmint - Website & App Building Platform",
     template: "%s | Webmint",
   },
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
   description:
-    "We build stunning websites and custom web apps that convert. Expert web development for growing businesses. Shopify from $799, custom builds from $2,499.",
+    "We build stunning websites and custom web apps that convert. Expert web development for growing businesses. Shopify builds from $300, custom builds from $1,000.",
   keywords: [
     "website builder",
     "web development",
