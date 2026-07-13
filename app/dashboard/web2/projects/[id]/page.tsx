@@ -14,6 +14,8 @@ import {
 import { ConnectSiteCard } from "@/components/dashboard/connect-site-card";
 import { PageTips } from "@/components/dashboard/page-tips";
 import { TaskList } from "@/components/dashboard/task-list";
+import { PhaseTracker } from "@/components/dashboard/phase-tracker";
+import { MilestoneApproval } from "@/components/dashboard/milestone-approval";
 
 const ADMIN_EMAIL = "merchantmagix@gmail.com";
 
@@ -100,6 +102,13 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           </Button>
         </div>
       </div>
+
+      {/* Phase tracker */}
+      <Card>
+        <CardContent className="pt-6">
+          <PhaseTracker status={project.status} />
+        </CardContent>
+      </Card>
 
       {/* Launched CTA */}
       {project.status === "LAUNCHED" && (
@@ -200,6 +209,20 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
                         )}
                         {milestone.status === "COMPLETED" && milestone.completedAt && (
                           <p className="text-xs text-brand-green mt-2 font-medium">Completed {formatDate(milestone.completedAt)}</p>
+                        )}
+                        {/* Approval buttons — clients only, on completed milestones */}
+                        {milestone.status === "COMPLETED" && !isAdmin && (
+                          <MilestoneApproval
+                            projectId={project.id}
+                            milestoneId={milestone.id}
+                            approvalStatus={(milestone as any).approvalStatus}
+                          />
+                        )}
+                        {/* Admin sees approval state */}
+                        {isAdmin && (milestone as any).approvalStatus && (
+                          <p className={`text-xs mt-2 font-medium ${(milestone as any).approvalStatus === "APPROVED" ? "text-brand-green" : "text-amber-400"}`}>
+                            {(milestone as any).approvalStatus === "APPROVED" ? "✓ Client approved" : "⟳ Client requested changes"}
+                          </p>
                         )}
                       </div>
                     </div>

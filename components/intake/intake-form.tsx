@@ -14,8 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/lib/toast-context";
-import { Loader2, ArrowRight, ArrowLeft, CheckCircle } from "lucide-react";
+import { Loader2, ArrowRight, ArrowLeft, CheckCircle, Clock, DollarSign, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { estimateQuote, type QuoteEstimate } from "@/lib/quote-estimator";
 
 const PROJECT_TYPES = [
   { value: "shopify", label: "Shopify Build" },
@@ -75,6 +76,7 @@ export function IntakeForm({
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [quote, setQuote] = useState<QuoteEstimate | null>(null);
   const [formData, setFormData] = useState<IntakeFormData>({
     projectType: "",
     businessName: "",
@@ -121,6 +123,7 @@ export function IntakeForm({
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error ?? "Failed to submit");
+      setQuote(estimateQuote(formData));
       setSubmitted(true);
       toast.success("Intake submitted! We'll review and get back to you via email.");
       onSuccess?.();
@@ -131,17 +134,54 @@ export function IntakeForm({
     }
   };
 
-  if (submitted) {
+  if (submitted && quote) {
     return (
-      <Card className="border-brand-green">
-        <CardContent className="pt-10 pb-10 text-center">
-          <div className="h-16 w-16 rounded-full bg-brand-green-dark flex items-center justify-center mx-auto mb-5">
-            <CheckCircle className="h-8 w-8 text-white" />
+      <Card className="border-brand-green overflow-hidden">
+        {/* Header */}
+        <div className="bg-brand-green/10 border-b border-brand-green/20 px-6 py-5 text-center">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-green/20 text-brand-green text-xs font-semibold uppercase tracking-wider mb-3">
+            <Sparkles className="h-3.5 w-3.5" />
+            Your instant estimate
           </div>
-          <h3 className="text-xl font-semibold mb-2">Thank you!</h3>
-          <p className="text-text-secondary text-sm max-w-sm mx-auto leading-relaxed">
-            We&apos;ve received your project details. We&apos;ll review and respond within 24 hours via email.
+          <h3 className="text-2xl font-semibold">{quote.headline}</h3>
+        </div>
+
+        <CardContent className="pt-6 space-y-6">
+          {/* Price + timeline */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="rounded-xl border border-border bg-surface p-4 text-center">
+              <DollarSign className="h-5 w-5 text-brand-green mx-auto mb-2" />
+              <div className="text-xl font-semibold">{quote.priceRange}</div>
+              <div className="text-[11px] text-text-muted uppercase tracking-wider mt-1">Estimated Range</div>
+            </div>
+            <div className="rounded-xl border border-border bg-surface p-4 text-center">
+              <Clock className="h-5 w-5 text-brand-green mx-auto mb-2" />
+              <div className="text-xl font-semibold">{quote.timeline}</div>
+              <div className="text-[11px] text-text-muted uppercase tracking-wider mt-1">Typical Timeline</div>
+            </div>
+          </div>
+
+          {/* Deliverables */}
+          <div>
+            <div className="text-sm font-medium mb-3">What&apos;s included</div>
+            <ul className="space-y-2">
+              {quote.deliverables.map((d) => (
+                <li key={d} className="flex items-start gap-2 text-sm text-text-secondary">
+                  <CheckCircle className="h-4 w-4 text-brand-green mt-0.5 shrink-0" />
+                  {d}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <p className="text-xs text-text-muted leading-relaxed border-t border-border pt-4">
+            {quote.note}
           </p>
+
+          <div className="flex items-center gap-2 text-sm text-brand-green font-medium">
+            <CheckCircle className="h-4 w-4" />
+            We&apos;ve got your details — check your email within 24 hours.
+          </div>
         </CardContent>
       </Card>
     );

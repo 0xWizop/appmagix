@@ -39,6 +39,8 @@ export interface FirestoreMilestone {
   sortOrder: number;
   createdAt: Date;
   updatedAt: Date;
+  approvalStatus?: "APPROVED" | "CHANGES_REQUESTED" | null;
+  approvalNote?: string | null;
 }
 
 export interface FirestoreTicket {
@@ -162,6 +164,8 @@ export async function getProjectWithDetails(
       sortOrder: m.sortOrder ?? 0,
       createdAt: toDate(m.createdAt),
       updatedAt: toDate(m.updatedAt),
+      approvalStatus: m.approvalStatus ?? null,
+      approvalNote: m.approvalNote ?? null,
     };
   });
 
@@ -1399,4 +1403,61 @@ export async function getAllUsers() {
     name: d.data().name ?? null,
     firebaseUid: d.id,
   }));
+}
+
+// ─── Milestones: approval ────────────────────────────────────────────────────
+
+export async function setMilestoneApproval(
+  projectId: string,
+  milestoneId: string,
+  ownerId: string,
+  approvalStatus: "APPROVED" | "CHANGES_REQUESTED",
+  note?: string
+): Promise<boolean> {
+  if (!adminApp) return false;
+  // Verify the project belongs to this owner
+  const projSnap = await db().collection("projects").doc(projectId).get();
+  if (!projSnap.exists || projSnap.data()?.ownerId !== ownerId) return false;
+
+  await db()
+    .collection("projects")
+    .doc(projectId)
+    .collection("milestones")
+    .doc(milestoneId)
+    .update({
+      approvalStatus,
+      approvalNote: note ?? null,
+      approvedAt: Timestamp.fromDate(new Date()),
+      updatedAt: Timestamp.fromDate(new Date()),
+    });
+  return true;
+}
+
+// Admin: create/update a milestone on any project
+export async function upsertMilestone(
+  projectId: string,
+  data: { id?: string; title: string; description?: string; status?: string; sortOrder?: number }
+): Promise<string> {
+  const now = Timestamp.fromDate(new Date());
+  const col = db().collection("projects").doc(projectId).collection("milestones");
+  if (data.id) {
+    await col.doc(data.id).update({
+      title: data.title,
+      description: data.description ?? null,
+      status: data.status ?? "PENDING",
+      sortOrder: data.sortOrder ?? 0,
+      updatedAt: now,
+    });
+    return data.id;
+  }
+  const ref = await col.add({
+    title: data.title,
+    description: data.description ?? null,
+    status: data.status ?? "PENDING",
+    sortOrder: data.sortOrder ?? 0,
+    approvalStatus: null,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return ref.id;
 }

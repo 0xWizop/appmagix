@@ -96,6 +96,11 @@ export default async function DashboardPage() {
     return Math.round((completed / milestones.length) * 100);
   };
 
+  // Primary (most recent) project for the progress hero
+  const primaryProject = dashboardData?.projects?.[0];
+  const primaryProgress = primaryProject ? getProgress(primaryProject.milestones) : 0;
+  const statusLabel = primaryProject ? (statusLabels[primaryProject.status] ?? primaryProject.status) : "";
+
   return (
     <PageMotion>
       <div className="p-6 lg:p-8 space-y-8">
@@ -105,6 +110,37 @@ export default async function DashboardPage() {
             Welcome back, {session?.user?.name?.split(" ")[0] || session?.user?.email?.split("@")[0] || "there"}
           </p>
         </div>
+
+        {/* Progress hero — primary project */}
+        {primaryProject && (
+          <Link href={`/dashboard/web2/projects/${primaryProject.id}`} className="block">
+            <div className="relative overflow-hidden rounded-2xl border border-brand-green/30 bg-gradient-to-br from-brand-green/10 via-surface to-surface p-6 hover:border-brand-green/50 transition-colors">
+              <div className="absolute -top-16 -right-16 h-48 w-48 bg-brand-green/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                  <div className="text-xs text-brand-green uppercase tracking-wider font-medium mb-1">
+                    {statusLabel}
+                  </div>
+                  <h2 className="text-xl font-semibold">{primaryProject.name}</h2>
+                  <p className="text-sm text-text-secondary mt-1">
+                    {primaryProgress === 100
+                      ? "Your project is launched 🚀"
+                      : `Your project is ${primaryProgress}% of the way to launch`}
+                  </p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <div className="text-4xl font-bold text-brand-green tabular-nums">{primaryProgress}%</div>
+                </div>
+              </div>
+              <div className="relative mt-4 h-2.5 bg-surface rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-brand-green-dark to-brand-green rounded-full transition-all duration-700"
+                  style={{ width: `${primaryProgress}%` }}
+                />
+              </div>
+            </div>
+          </Link>
+        )}
 
         {/* Stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

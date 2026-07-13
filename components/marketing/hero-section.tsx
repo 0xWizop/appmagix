@@ -4,8 +4,9 @@ import { motion } from "framer-motion";
 import { Badge } from "@/components/ui/badge";
 import { AnimatedCta } from "@/components/marketing/animated-cta";
 import { HeroGradient } from "@/components/marketing/hero-gradient";
-import { Zap, CheckCircle } from "lucide-react";
+import { CheckCircle } from "lucide-react";
 import { staggerContainer, staggerItem } from "@/lib/motion";
+import { SlotsBadge } from "@/components/marketing/slots-badge";
 
 export function HeroSection() {
   return (
@@ -20,10 +21,11 @@ export function HeroSection() {
           initial="hidden"
           animate="visible"
         >
-          <motion.div variants={staggerItem} className="mb-6">
-            <Badge variant="outline" className="mb-4">
+          <motion.div variants={staggerItem} className="mb-6 flex flex-col items-center gap-3">
+            <Badge variant="outline">
               Bespoke Design & Development
             </Badge>
+            <SlotsBadge />
           </motion.div>
 
           <motion.h1
