@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/firebase-session";
 import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
-import { db } from "@/lib/db";
+import { getInvoicesByUser, getProjectsByOwner } from "@/lib/firestore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,26 +40,22 @@ export default async function BillingPage() {
         session.user.email,
         session.user.name
       );
-      isAdmin = user.role === "ADMIN" || session.user.email === "merchantmagix@gmail.com";
-      const [invList, count] = await Promise.all([
-        db.invoice.findMany({
-          where: { userId: user.id },
-          orderBy: { createdAt: "desc" },
-          include: { project: { select: { name: true } } },
-        }),
-        db.project.count({ where: { userId: user.id } }),
+      isAdmin = user.role === "ADMIN" || session.user.email === "webmintdevelopment@gmail.com" || session.user.email === "merchantmagix@gmail.com";
+      const [invList, projList] = await Promise.all([
+        getInvoicesByUser(session.user.id),
+        getProjectsByOwner(session.user.id),
       ]);
-      projectCount = count;
+      projectCount = projList.length;
       invoices = invList.map((i) => ({
         id: i.id,
         invoiceNumber: i.invoiceNumber,
         amount: i.amount,
         status: i.status,
-        description: i.description,
-        dueDate: i.dueDate,
-        paidAt: i.paidAt,
+        description: i.description ?? null,
+        dueDate: i.dueDate ?? null,
+        paidAt: i.paidAt ?? null,
         createdAt: i.createdAt,
-        project: i.project ? { name: i.project.name } : undefined,
+        project: i.project,
         stripePaymentUrl: i.stripePaymentUrl,
         pdfUrl: i.pdfUrl,
       }));

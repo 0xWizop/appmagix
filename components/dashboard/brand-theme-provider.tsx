@@ -48,7 +48,8 @@ export function BrandThemeProvider({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     fetchColors();
-  }, [pathname]); // Refresh on navigation just in case
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   return (
     <BrandThemeContext.Provider value={{ colors, refreshColors: fetchColors }}>

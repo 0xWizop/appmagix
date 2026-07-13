@@ -673,6 +673,7 @@ export async function getDashboardData(userId: string): Promise<{
   projectsInDevelopment: number;
   recentActivity: DashboardActivity[];
   projects: (FirestoreProject & { milestones: { status?: string }[] })[];
+  needAttention: { type: string; id: string; title: string; meta?: string; href: string }[];
 }> {
   const [projects, tickets, invoices] = await Promise.all([
     getProjectsWithMilestones(userId),
@@ -725,6 +726,26 @@ export async function getDashboardData(userId: string): Promise<{
   activity.sort((a, b) => b.date.getTime() - a.date.getTime());
   const recentActivity = activity.slice(0, 10);
 
+  // Items needing attention: pending invoices + open tickets
+  const needAttention: { type: string; id: string; title: string; meta?: string; href: string }[] = [];
+  pendingInvoices.forEach((i) => {
+    needAttention.push({
+      type: "invoice",
+      id: i.id,
+      title: `Invoice ${i.invoiceNumber}`,
+      meta: `$${(i.amount / 100).toFixed(2)}`,
+      href: "/dashboard/web2/billing",
+    });
+  });
+  openTickets.forEach((t) => {
+    needAttention.push({
+      type: "ticket",
+      id: t.id,
+      title: t.subject,
+      href: `/dashboard/web2/support/${t.id}`,
+    });
+  });
+
   return {
     projectCount: projects.length,
     openTicketCount: openTickets.length,
@@ -732,6 +753,7 @@ export async function getDashboardData(userId: string): Promise<{
     projectsInDevelopment: projectsInDev,
     recentActivity,
     projects: projects.slice(0, 5),
+    needAttention,
   };
 }
 
@@ -996,4 +1018,385 @@ export async function createProjectFromIntake(
   } catch (e) {
     return { ok: false, error: String(e) };
   }
+}
+
+// ─── Projects: write + admin ────────────────────────────────────────────────
+
+export async function createProject(data: {
+  ownerId: string;
+  name: string;
+  description?: string;
+  type: string;
+}): Promise<FirestoreProject> {
+  const now = new Date();
+  const ref = await db().collection("projects").add({
+    ownerId: data.ownerId,
+    name: data.name,
+    description: data.description ?? null,
+    type: data.type,
+    status: "DISCOVERY",
+    createdAt: Timestamp.fromDate(now),
+    updatedAt: Timestamp.fromDate(now),
+  });
+  return {
+    id: ref.id,
+    ownerId: data.ownerId,
+    name: data.name,
+    description: data.description,
+    type: data.type,
+    status: "DISCOVERY",
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+export async function updateProjectStatus(projectId: string, status: string): Promise<boolean> {
+  if (!adminApp) return false;
+  await db().collection("projects").doc(projectId).update({
+    status,
+    updatedAt: Timestamp.fromDate(new Date()),
+  });
+  return true;
+}
+
+// Admin: full project details for any owner
+export async function getProjectWithDetailsAdmin(projectId: string) {
+  if (!adminApp) return null;
+  const projectSnap = await db().collection("projects").doc(projectId).get();
+  if (!projectSnap.exists) return null;
+  const data = projectSnap.data()!;
+  const ownerId = data.ownerId;
+  const full = await getProjectWithDetails(projectId, ownerId);
+  if (!full) return null;
+  // Attach owner info
+  let owner: { name: string | null; email: string } | undefined;
+  const ownerSnap = await db().collection("users").doc(ownerId).get();
+  if (ownerSnap.exists) {
+    owner = { name: ownerSnap.data()?.name ?? null, email: ownerSnap.data()?.email ?? "" };
+  }
+  return { ...full, owner };
+}
+
+// ─── Tickets: update, delete, admin ──────────────────────────────────────────
+
+export async function updateTicket(
+  ticketId: string,
+  updates: { status?: string; priority?: string }
+): Promise<boolean> {
+  if (!adminApp) return false;
+  const patch: Record<string, unknown> = { updatedAt: Timestamp.fromDate(new Date()) };
+  if (updates.status) patch.status = updates.status;
+  if (updates.priority) patch.priority = updates.priority;
+  await db().collection("tickets").doc(ticketId).update(patch);
+  return true;
+}
+
+export async function deleteTicket(ticketId: string): Promise<boolean> {
+  if (!adminApp) return false;
+  await db().collection("tickets").doc(ticketId).delete();
+  return true;
+}
+
+export async function getTicketOwner(ticketId: string): Promise<string | null> {
+  if (!adminApp) return null;
+  const snap = await db().collection("tickets").doc(ticketId).get();
+  if (!snap.exists) return null;
+  return snap.data()?.userId ?? null;
+}
+
+// Admin: ticket with messages for any owner
+export async function getTicketWithMessagesAdmin(ticketId: string) {
+  if (!adminApp) return null;
+  const ownerId = await getTicketOwner(ticketId);
+  if (!ownerId) return null;
+  const ticket = await getTicketWithMessages(ticketId, ownerId);
+  if (!ticket) return null;
+  let owner: { name: string | null; email: string } | undefined;
+  const ownerSnap = await db().collection("users").doc(ownerId).get();
+  if (ownerSnap.exists) {
+    owner = { name: ownerSnap.data()?.name ?? null, email: ownerSnap.data()?.email ?? "" };
+  }
+  return { ...ticket, user: owner };
+}
+
+// Admin: add message to any ticket (bypasses owner check)
+export async function addTicketMessageAdmin(
+  ticketId: string,
+  senderId: string,
+  content: string
+): Promise<FirestoreMessage | null> {
+  if (!adminApp) return null;
+  const ticketSnap = await db().collection("tickets").doc(ticketId).get();
+  if (!ticketSnap.exists) return null;
+  const now = new Date();
+  const ref = await db().collection("tickets").doc(ticketId).collection("messages").add({
+    senderId,
+    content,
+    createdAt: Timestamp.fromDate(now),
+  });
+  await db().collection("tickets").doc(ticketId).update({
+    updatedAt: Timestamp.fromDate(now),
+  });
+  return { id: ref.id, ticketId, senderId, content, createdAt: now };
+}
+
+// Admin: all tickets across all clients
+export async function getAllTickets() {
+  if (!adminApp) return [];
+  const snap = await db().collection("tickets").orderBy("createdAt", "desc").get();
+  const results = [];
+  for (const d of snap.docs) {
+    const data = d.data();
+    let projectName: string | undefined;
+    if (data.projectId) {
+      const p = await db().collection("projects").doc(data.projectId).get();
+      projectName = p.data()?.name ?? p.data()?.title;
+    }
+    let userInfo = { name: null as string | null, email: "" };
+    if (data.userId) {
+      const u = await db().collection("users").doc(data.userId).get();
+      if (u.exists) userInfo = { name: u.data()?.name ?? null, email: u.data()?.email ?? "" };
+    }
+    const msgSnap = await db().collection("tickets").doc(d.id).collection("messages").get();
+    results.push({
+      id: d.id,
+      subject: data.subject ?? "",
+      status: data.status ?? "OPEN",
+      priority: data.priority ?? "MEDIUM",
+      createdAt: toDate(data.createdAt),
+      user: userInfo,
+      project: projectName ? { name: projectName } : null,
+      _count: { messages: msgSnap.size },
+    });
+  }
+  return results;
+}
+
+// ─── Invoices: create, update, get, admin ────────────────────────────────────
+
+export async function createInvoice(data: {
+  userId: string;
+  projectId?: string;
+  amount: number;
+  description?: string;
+  dueDate?: Date;
+}): Promise<FirestoreInvoiceFull> {
+  const now = new Date();
+  // Generate invoice number
+  const countSnap = await db().collection("invoices").count().get();
+  const num = countSnap.data().count + 1;
+  const invoiceNumber = `INV-${String(num).padStart(4, "0")}`;
+
+  const ref = await db().collection("invoices").add({
+    userId: data.userId,
+    projectId: data.projectId ?? null,
+    invoiceNumber,
+    amount: data.amount,
+    status: "PENDING",
+    description: data.description ?? null,
+    dueDate: data.dueDate ? Timestamp.fromDate(data.dueDate) : null,
+    paidAt: null,
+    createdAt: Timestamp.fromDate(now),
+    updatedAt: Timestamp.fromDate(now),
+  });
+  return {
+    id: ref.id,
+    invoiceNumber,
+    amount: data.amount,
+    status: "PENDING",
+    createdAt: now,
+    updatedAt: now,
+    description: data.description,
+    dueDate: data.dueDate,
+  };
+}
+
+export async function updateInvoice(
+  invoiceId: string,
+  updates: { status?: string; paidAt?: Date; stripePaymentUrl?: string; pdfUrl?: string }
+): Promise<boolean> {
+  if (!adminApp) return false;
+  const patch: Record<string, unknown> = { updatedAt: Timestamp.fromDate(new Date()) };
+  if (updates.status) patch.status = updates.status;
+  if (updates.paidAt) patch.paidAt = Timestamp.fromDate(updates.paidAt);
+  if (updates.stripePaymentUrl !== undefined) patch.stripePaymentUrl = updates.stripePaymentUrl;
+  if (updates.pdfUrl !== undefined) patch.pdfUrl = updates.pdfUrl;
+  await db().collection("invoices").doc(invoiceId).update(patch);
+  return true;
+}
+
+export async function getInvoiceById(invoiceId: string, ownerId?: string): Promise<FirestoreInvoiceFull & { userId: string; user?: { name: string | null; email: string } } | null> {
+  if (!adminApp) return null;
+  const snap = await db().collection("invoices").doc(invoiceId).get();
+  if (!snap.exists) return null;
+  const data = snap.data()!;
+  if (ownerId && data.userId !== ownerId) return null;
+  let projectName: string | undefined;
+  if (data.projectId) {
+    const p = await db().collection("projects").doc(data.projectId).get();
+    projectName = p.data()?.name ?? p.data()?.title;
+  }
+  let user: { name: string | null; email: string } | undefined;
+  if (data.userId) {
+    const u = await db().collection("users").doc(data.userId).get();
+    if (u.exists) user = { name: u.data()?.name ?? null, email: u.data()?.email ?? "" };
+  }
+  return {
+    id: snap.id,
+    userId: data.userId,
+    invoiceNumber: data.invoiceNumber ?? "",
+    amount: data.amount ?? 0,
+    status: data.status ?? "PENDING",
+    createdAt: toDate(data.createdAt),
+    updatedAt: toDate(data.updatedAt),
+    project: projectName ? { name: projectName } : undefined,
+    dueDate: data.dueDate ? toDate(data.dueDate) : undefined,
+    paidAt: data.paidAt ? toDate(data.paidAt) : undefined,
+    stripePaymentUrl: data.stripePaymentUrl,
+    pdfUrl: data.pdfUrl,
+    description: data.description,
+    user,
+  };
+}
+
+// Admin: all invoices across all clients
+export async function getAllInvoices() {
+  if (!adminApp) return [];
+  const snap = await db().collection("invoices").orderBy("createdAt", "desc").get();
+  const results = [];
+  for (const d of snap.docs) {
+    const data = d.data();
+    let projectName: string | undefined;
+    if (data.projectId) {
+      const p = await db().collection("projects").doc(data.projectId).get();
+      projectName = p.data()?.name ?? p.data()?.title;
+    }
+    let userInfo = { name: null as string | null, email: "" };
+    if (data.userId) {
+      const u = await db().collection("users").doc(data.userId).get();
+      if (u.exists) userInfo = { name: u.data()?.name ?? null, email: u.data()?.email ?? "" };
+    }
+    results.push({
+      id: d.id,
+      invoiceNumber: data.invoiceNumber ?? "",
+      amount: data.amount ?? 0,
+      status: data.status ?? "PENDING",
+      createdAt: toDate(data.createdAt),
+      dueDate: data.dueDate ? toDate(data.dueDate) : null,
+      user: userInfo,
+      project: projectName ? { name: projectName } : null,
+    });
+  }
+  return results;
+}
+
+// ─── Clients (admin) ─────────────────────────────────────────────────────────
+
+export async function getAllClients() {
+  if (!adminApp) return [];
+  const snap = await db().collection("users").orderBy("createdAt", "desc").get();
+  const results = [];
+  for (const d of snap.docs) {
+    const data = d.data();
+    if (data.role === "ADMIN") continue;
+    const [projSnap, ticketSnap, projList] = await Promise.all([
+      db().collection("projects").where("ownerId", "==", d.id).count().get(),
+      db().collection("tickets").where("userId", "==", d.id).count().get(),
+      db().collection("projects").where("ownerId", "==", d.id).orderBy("createdAt", "desc").limit(1).get(),
+    ]);
+    results.push({
+      id: d.id,
+      name: data.name ?? null,
+      email: data.email ?? "",
+      avatarUrl: data.avatarUrl ?? null,
+      createdAt: toDate(data.createdAt),
+      _count: {
+        projects: projSnap.data().count,
+        tickets: ticketSnap.data().count,
+      },
+      projects: projList.docs.map((p) => ({ id: p.id, name: p.data().name ?? "" })),
+    });
+  }
+  return results;
+}
+
+export async function getClientDetail(clientId: string) {
+  if (!adminApp) return null;
+  const userSnap = await db().collection("users").doc(clientId).get();
+  if (!userSnap.exists) return null;
+  const data = userSnap.data()!;
+
+  const [projSnap, ticketSnap, invSnap] = await Promise.all([
+    db().collection("projects").where("ownerId", "==", clientId).orderBy("createdAt", "desc").get(),
+    db().collection("tickets").where("userId", "==", clientId).orderBy("updatedAt", "desc").limit(10).get(),
+    db().collection("invoices").where("userId", "==", clientId).orderBy("createdAt", "desc").limit(10).get(),
+  ]);
+
+  // Milestones per project
+  const projects = [];
+  for (const p of projSnap.docs) {
+    const msSnap = await db().collection("projects").doc(p.id).collection("milestones").get();
+    projects.push({
+      id: p.id,
+      name: p.data().name ?? "",
+      status: p.data().status ?? "DISCOVERY",
+      milestones: msSnap.docs.map((m) => ({ status: m.data().status ?? "PENDING" })),
+    });
+  }
+
+  const tickets = [];
+  for (const t of ticketSnap.docs) {
+    const td = t.data();
+    let projectName: string | undefined;
+    if (td.projectId) {
+      const p = await db().collection("projects").doc(td.projectId).get();
+      projectName = p.data()?.name;
+    }
+    tickets.push({
+      id: t.id,
+      subject: td.subject ?? "",
+      status: td.status ?? "OPEN",
+      project: projectName ? { name: projectName } : null,
+    });
+  }
+
+  const invoices = [];
+  for (const i of invSnap.docs) {
+    const id = i.data();
+    let projectName: string | undefined;
+    if (id.projectId) {
+      const p = await db().collection("projects").doc(id.projectId).get();
+      projectName = p.data()?.name;
+    }
+    invoices.push({
+      id: i.id,
+      invoiceNumber: id.invoiceNumber ?? "",
+      amount: id.amount ?? 0,
+      status: id.status ?? "PENDING",
+      createdAt: toDate(id.createdAt),
+      project: projectName ? { name: projectName } : null,
+    });
+  }
+
+  return {
+    id: clientId,
+    name: data.name ?? null,
+    email: data.email ?? "",
+    createdAt: toDate(data.createdAt),
+    projects,
+    tickets,
+    invoices,
+  };
+}
+
+// All users with a certain field (for cron)
+export async function getAllUsers() {
+  if (!adminApp) return [];
+  const snap = await db().collection("users").get();
+  return snap.docs.map((d) => ({
+    id: d.id,
+    email: d.data().email ?? "",
+    name: d.data().name ?? null,
+    firebaseUid: d.id,
+  }));
 }

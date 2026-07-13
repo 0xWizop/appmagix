@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { getProjectsByOwner, getSitesByOwner, getAnalyticsForProject, getAnalyticsForSite } from "@/lib/firestore";
+import { getProjectsByOwner, getSitesByOwner, getAnalyticsForProject, getAnalyticsForSite, getAllUsers } from "@/lib/firestore";
 import { Resend } from "resend";
 
 export const dynamic = "force-dynamic";
@@ -22,11 +21,7 @@ export async function GET(req: NextRequest) {
   }
 
   const DAYS = 7;
-  // Send to all users who have a Firebase UID (connected sites users)
-  const users = await db.user.findMany({
-    where: { firebaseUid: { not: null } },
-    select: { id: true, email: true, name: true, firebaseUid: true },
-  });
+  const users = await getAllUsers();
 
   let sent = 0;
   for (const user of users) {

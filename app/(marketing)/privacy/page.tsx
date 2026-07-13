@@ -19,17 +19,17 @@ export default function PrivacyPage() {
 
           <div>
             <h2 className="text-xl font-medium text-text-primary mb-3">How we use it</h2>
-            <p>We use your information to deliver the services you've requested, communicate with you about your project, send invoices and receipts, and improve our service. We do not sell your data to third parties.</p>
+            <p>We use your information to deliver the services you&apos;ve requested, communicate with you about your project, send invoices and receipts, and improve our service. We do not sell your data to third parties.</p>
           </div>
 
           <div>
             <h2 className="text-xl font-medium text-text-primary mb-3">Analytics</h2>
-            <p>If you connect your website to our analytics service, we collect anonymised page view data from your site's visitors. This data is stored securely and only accessible to you through your dashboard.</p>
+            <p>If you connect your website to our analytics service, we collect anonymised page view data from your site&apos;s visitors. This data is stored securely and only accessible to you through your dashboard.</p>
           </div>
 
           <div>
             <h2 className="text-xl font-medium text-text-primary mb-3">Payments</h2>
-            <p>Payments are processed by Stripe. We do not store your card details. Stripe's privacy policy applies to payment processing.</p>
+            <p>Payments are processed by Stripe. We do not store your card details. Stripe&apos;s privacy policy applies to payment processing.</p>
           </div>
 
           <div>
@@ -46,3 +46,4 @@ export default function PrivacyPage() {
     </section>
   );
 }
+

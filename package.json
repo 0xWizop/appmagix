@@ -70,6 +70,7 @@
     "@types/react-dom": "^18",
     "autoprefixer": "^10.0.1",
     "dotenv": "^16.6.1",
+    "esbuild": "^0.19.12",
     "eslint": "^8",
     "eslint-config-next": "14.2.0",
     "postcss": "^8",

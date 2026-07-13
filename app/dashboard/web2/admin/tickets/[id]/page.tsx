@@ -112,12 +112,12 @@ export default async function AdminTicketDetailPage({
                   <div className="flex items-center gap-3">
                     <Avatar className="h-8 w-8">
                       <AvatarFallback className="bg-surface-hover text-xs">
-                        {getInitials(message.sender?.name, message.sender?.email)}
+                        {getInitials(message.sender?.displayName, message.sender?.email)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm">{message.sender?.name ?? message.sender?.email ?? "User"}</span>
+                        <span className="font-medium text-sm">{message.sender?.displayName ?? message.sender?.email ?? "User"}</span>
                         {isAdminMessage && <Badge variant="secondary" className="text-xs">Webmint</Badge>}
                       </div>
                       <div className="text-xs text-text-muted">{formatDate(message.createdAt)}</div>

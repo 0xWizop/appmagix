@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getSession } from "@/lib/firebase-session";
 import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
-import { db } from "@/lib/db";
+import { getClientDetail } from "@/lib/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { formatDate, formatCurrency } from "@/lib/utils";
 import { ArrowLeft, FolderKanban, MessageSquare, CreditCard, ExternalLink } from "lucide-react";
 
-const ADMIN_EMAIL = "merchantmagix@gmail.com";
+const ADMIN_EMAIL = "webmintdevelopment@gmail.com";
 
 const statusColors: Record<string, "default" | "secondary" | "success" | "warning" | "info"> = {
   DISCOVERY: "info", DESIGN: "warning", DEVELOPMENT: "default", REVIEW: "warning", LAUNCHED: "success",
@@ -29,25 +29,7 @@ export default async function AdminClientDetailPage({
   const isAdmin = user.role === "ADMIN" || session.user.email === ADMIN_EMAIL;
   if (!isAdmin) notFound();
 
-  const client = await db.user.findUnique({
-    where: { id },
-    include: {
-      projects: {
-        orderBy: { createdAt: "desc" },
-        include: { milestones: { select: { status: true } } },
-      },
-      tickets: {
-        orderBy: { updatedAt: "desc" },
-        take: 10,
-        include: { project: { select: { name: true } } },
-      },
-      invoices: {
-        orderBy: { createdAt: "desc" },
-        take: 10,
-        include: { project: { select: { name: true } } },
-      },
-    },
-  }).catch(() => null);
+  const client = await getClientDetail(id).catch(() => null);
 
   if (!client) notFound();
 

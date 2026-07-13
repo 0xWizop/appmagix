@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
-import { db } from "@/lib/db";
+import { updateInvoice } from "@/lib/firestore";
 import Stripe from "stripe";
 
 export const dynamic = "force-dynamic";
@@ -36,10 +36,7 @@ export async function POST(req: NextRequest) {
     const invoiceId = session.metadata?.invoiceId;
     if (invoiceId) {
       try {
-        await db.invoice.update({
-          where: { id: invoiceId },
-          data: { status: "PAID", paidAt: new Date() },
-        });
+        await updateInvoice(invoiceId, { status: "PAID", paidAt: new Date() });
       } catch (e) {
         console.error("Failed to update invoice after payment:", e);
         return NextResponse.json({ error: "Failed to update invoice" }, { status: 500 });

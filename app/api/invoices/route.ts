@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/firebase-session";
 import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
-import { db } from "@/lib/db";
+import { getInvoicesByUser, createInvoice, updateInvoice } from "@/lib/firestore";
 import { stripe } from "@/lib/stripe";
 import { sendInvoiceCreatedEmail } from "@/lib/email";
 import { formatCurrency } from "@/lib/utils";
@@ -17,42 +17,14 @@ const createInvoiceSchema = z.object({
   dueDate: z.string().optional(),
 });
 
-function generateInvoiceNumber(): string {
-  const y = new Date().getFullYear();
-  return `INV-${y}-${Date.now().toString(36).toUpperCase().slice(-6)}`;
-}
-
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const session = await getSession();
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const user = await getOrCreateUserByFirebaseUid(
-      session.user.id,
-      session.user.email,
-      session.user.name
-    );
-    const invoices = await db.invoice.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: "desc" },
-      include: { project: { select: { name: true } } },
-    });
-    return NextResponse.json({
-      invoices: invoices.map((i) => ({
-        id: i.id,
-        invoiceNumber: i.invoiceNumber,
-        amount: i.amount,
-        status: i.status,
-        description: i.description,
-        dueDate: i.dueDate,
-        paidAt: i.paidAt,
-        createdAt: i.createdAt,
-        project: i.project ? { name: i.project.name } : undefined,
-        stripePaymentUrl: i.stripePaymentUrl,
-        pdfUrl: i.pdfUrl,
-      })),
-    });
+    const invoices = await getInvoicesByUser(session.user.id);
+    return NextResponse.json({ invoices });
   } catch (error) {
     console.error("Error fetching invoices:", error);
     return NextResponse.json({ error: "Failed to fetch invoices" }, { status: 500 });
@@ -65,11 +37,7 @@ export async function POST(req: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const user = await getOrCreateUserByFirebaseUid(
-      session.user.id,
-      session.user.email,
-      session.user.name
-    );
+    const user = await getOrCreateUserByFirebaseUid(session.user.id, session.user.email, session.user.name);
 
     const body = await req.json();
     const parsed = createInvoiceSchema.safeParse({
@@ -77,42 +45,26 @@ export async function POST(req: NextRequest) {
       amount: typeof body.amount === "string" ? parseFloat(body.amount) : body.amount,
     });
     if (!parsed.success) {
-      return NextResponse.json(
-        { error: parsed.error.errors[0]?.message ?? "Invalid input" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: parsed.error.errors[0]?.message ?? "Invalid input" }, { status: 400 });
     }
     const { amount, customerEmail, description, projectId, dueDate } = parsed.data;
 
-    if (projectId) {
-      const project = await db.project.findFirst({
-        where: { id: projectId, userId: user.id },
-      });
-      if (!project) {
-        return NextResponse.json({ error: "Project not found" }, { status: 404 });
-      }
-    }
-
     const amountCents = Math.round(amount * 100);
-    const invoice = await db.invoice.create({
-      data: {
-        userId: user.id,
-        projectId: projectId || null,
-        invoiceNumber: generateInvoiceNumber(),
-        amount: amountCents,
-        description: description?.trim() || null,
-        dueDate: dueDate ? new Date(dueDate) : null,
-      },
+    const invoice = await createInvoice({
+      userId: session.user.id,
+      projectId: projectId || undefined,
+      amount: amountCents,
+      description: description?.trim() || undefined,
+      dueDate: dueDate ? new Date(dueDate) : undefined,
     });
 
     let stripePaymentUrl: string | null = null;
-    let stripeSessionId: string | null = null;
 
     if (stripe && amountCents > 0) {
       const baseUrl =
         process.env.NEXT_PUBLIC_APP_URL ||
         (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3001");
-      const session = await stripe.checkout.sessions.create({
+      const checkout = await stripe.checkout.sessions.create({
         mode: "payment",
         customer_email: customerEmail.trim(),
         line_items: [
@@ -132,39 +84,20 @@ export async function POST(req: NextRequest) {
         cancel_url: `${baseUrl}/dashboard/web2/billing`,
         metadata: { invoiceId: invoice.id },
       });
-      stripeSessionId = session.id;
-      stripePaymentUrl = session.url;
-      await db.invoice.update({
-        where: { id: invoice.id },
-        data: {
-          stripePaymentUrl,
-          stripeInvoiceId: stripeSessionId,
-        },
-      });
+      stripePaymentUrl = checkout.url;
+      await updateInvoice(invoice.id, { stripePaymentUrl: stripePaymentUrl ?? undefined });
 
-      // Send email to client
       sendInvoiceCreatedEmail({
         to: customerEmail.trim(),
         clientName: user.name || "there",
         invoiceNumber: invoice.invoiceNumber,
         amount: formatCurrency(amountCents / 100),
         paymentUrl: stripePaymentUrl!,
-      }).catch(err => console.error("Failed to send invoice email:", err));
+      }).catch((err) => console.error("Failed to send invoice email:", err));
     }
 
     return NextResponse.json(
-      {
-        invoice: {
-          id: invoice.id,
-          invoiceNumber: invoice.invoiceNumber,
-          amount: invoice.amount,
-          status: invoice.status,
-          description: invoice.description,
-          dueDate: invoice.dueDate,
-          createdAt: invoice.createdAt,
-          stripePaymentUrl: stripePaymentUrl ?? undefined,
-        },
-      },
+      { invoice: { ...invoice, stripePaymentUrl: stripePaymentUrl ?? undefined } },
       { status: 201 }
     );
   } catch (error) {

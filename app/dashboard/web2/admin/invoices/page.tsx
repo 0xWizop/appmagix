@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { getAllInvoices } from "@/lib/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,17 +22,7 @@ export default async function AdminInvoicesPage() {
   };
   
   try {
-    invoices = await db.invoice.findMany({
-      include: {
-        user: {
-          select: { name: true, email: true },
-        },
-        project: {
-          select: { name: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    invoices = await getAllInvoices();
 
     stats.total = invoices.reduce((sum, inv) => sum + inv.amount, 0);
     stats.paid = invoices

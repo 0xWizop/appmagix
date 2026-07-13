@@ -1,4 +1,4 @@
-import { db } from "@/lib/db";
+import { getAllTickets } from "@/lib/firestore";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
@@ -21,24 +21,7 @@ export default async function AdminTicketsPage() {
   let tickets: any[] = [];
   
   try {
-    tickets = await db.ticket.findMany({
-      include: {
-        user: {
-          select: { name: true, email: true },
-        },
-        project: {
-          select: { name: true },
-        },
-        _count: {
-          select: { messages: true },
-        },
-      },
-      orderBy: [
-        { status: "asc" },
-        { priority: "desc" },
-        { createdAt: "desc" },
-      ],
-    });
+    tickets = await getAllTickets();
   } catch (error) {
     console.error("Error fetching tickets:", error);
   }

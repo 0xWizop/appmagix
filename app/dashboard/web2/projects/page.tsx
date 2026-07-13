@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { getSession } from "@/lib/firebase-session";
-import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
-import { db } from "@/lib/db";
+import { getProjectsWithMilestones } from "@/lib/firestore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,26 +39,17 @@ export default async function ProjectsPage() {
 
   try {
     if (session?.user?.id) {
-      const user = await getOrCreateUserByFirebaseUid(
-        session.user.id,
-        session.user.email,
-        session.user.name
-      );
-      const list = await db.project.findMany({
-        where: { userId: user.id },
-        orderBy: { updatedAt: "desc" },
-        include: { milestones: { orderBy: { sortOrder: "asc" } } },
-      });
+      const list = await getProjectsWithMilestones(session.user.id);
       projects = list.map((p) => ({
         id: p.id,
         name: p.name,
         type: p.type,
         status: p.status,
-        description: p.description,
-        startDate: p.startDate,
-        targetLaunchDate: p.targetLaunchDate,
-        websiteUrl: p.websiteUrl,
-        milestones: p.milestones.map((m) => ({ status: m.status })),
+        description: p.description ?? null,
+        startDate: p.startDate ?? null,
+        targetLaunchDate: p.targetLaunchDate ?? null,
+        websiteUrl: p.websiteUrl ?? null,
+        milestones: p.milestones.map((m) => ({ status: m.status ?? "PENDING" })),
       }));
     }
   } catch (error) {

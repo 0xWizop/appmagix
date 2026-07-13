@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/firebase-session";
-import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
-import { db } from "@/lib/db";
+import { getInvoiceById } from "@/lib/firestore";
 import { sendInvoiceReminder } from "@/lib/email";
 import { formatCurrency, formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
+const ADMIN_EMAILS = ["webmintdevelopment@gmail.com", "merchantmagix@gmail.com"];
+
 export async function POST(
-  req: NextRequest,
+  _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -17,25 +18,13 @@ export async function POST(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const prismaUser = await getOrCreateUserByFirebaseUid(
-      session.user.id,
-      session.user.email,
-      session.user.name
-    );
-
     // Only admins can send reminders (they send to the client)
-    const isAdmin = session.user.role === "ADMIN";
+    const isAdmin = session.user.email && ADMIN_EMAILS.includes(session.user.email);
     if (!isAdmin) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const invoice = await db.invoice.findFirst({
-      where: { id: params.id },
-      include: {
-        user: { select: { id: true, name: true, email: true } },
-        project: { select: { name: true } },
-      },
-    });
+    const invoice = await getInvoiceById(params.id);
 
     if (!invoice) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });

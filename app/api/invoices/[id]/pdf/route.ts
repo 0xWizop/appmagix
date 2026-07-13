@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/firebase-session";
-import { getOrCreateUserByFirebaseUid } from "@/lib/get-prisma-user";
-import { db } from "@/lib/db";
+import { getInvoiceById } from "@/lib/firestore";
 
 export const dynamic = "force-dynamic";
+
+const ADMIN_EMAILS = ["webmintdevelopment@gmail.com", "merchantmagix@gmail.com"];
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -17,16 +18,8 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
     }
 
     const { id: invoiceId } = await params;
-    const user = await getOrCreateUserByFirebaseUid(
-      session.user.id,
-      session.user.email,
-      session.user.name
-    );
-
-    const invoice = await db.invoice.findFirst({
-      where: { id: invoiceId, userId: user.id },
-      include: { project: { select: { name: true } }, user: { select: { name: true, email: true } } },
-    });
+    const isAdmin = session.user.email && ADMIN_EMAILS.includes(session.user.email);
+    const invoice = await getInvoiceById(invoiceId, isAdmin ? undefined : session.user.id);
 
     if (!invoice) {
       return new NextResponse("Invoice not found", { status: 404 });
@@ -238,8 +231,8 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
         </div>
         <div>
           <div class="party-label">Bill To</div>
-          <div class="party-name">${invoice.user.name || "Client"}</div>
-          <div class="party-detail">${invoice.user.email}</div>
+          <div class="party-name">${invoice.user?.name || "Client"}</div>
+          <div class="party-detail">${invoice.user?.email || ""}</div>
           ${invoice.project ? `<div class="party-detail">Project: ${invoice.project.name}</div>` : ""}
         </div>
       </div>

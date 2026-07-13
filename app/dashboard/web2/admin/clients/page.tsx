@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { db } from "@/lib/db";
+import { getAllClients } from "@/lib/firestore";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,23 +11,7 @@ export default async function AdminClientsPage() {
   let clients: any[] = [];
   
   try {
-    clients = await db.user.findMany({
-      where: { role: "CLIENT" },
-      include: {
-        _count: {
-          select: {
-            projects: true,
-            tickets: true,
-            invoices: true,
-          },
-        },
-        projects: {
-          take: 1,
-          orderBy: { createdAt: "desc" },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+    clients = await getAllClients();
   } catch (error) {
     console.error("Error fetching clients:", error);
   }
